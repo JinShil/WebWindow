@@ -149,6 +149,18 @@ public class Dom
         return f;
     }
 
+    static Future EmitAsync(string js)
+    {
+        var f = new Future();
+        webkit_web_view_run_javascript(_webView, js, nint.Zero, Marshal.GetFunctionPointerForDelegate<void_nint_nint_nint>(f.Finish), nint.Zero);
+        return f;
+    }
+
+    public static void Emit(string js)
+    {
+        EmitAsync(js).Wait();
+    }
+
     static Document? _document;
     public static Document Document
     {

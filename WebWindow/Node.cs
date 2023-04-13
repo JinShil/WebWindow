@@ -24,4 +24,14 @@ public abstract class Node
         }
         Dom.Write($"{Selector}.{property}={sValue};");
     }
+
+    protected void Invoke(string method, params string[] args)
+    {
+        Dom.Emit($"{method}({string.Join(',', args)});");
+    }
+
+    protected void Emit(string js)
+    {
+        Dom.Emit(js);
+    }
 }
