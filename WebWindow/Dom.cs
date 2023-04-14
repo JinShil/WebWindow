@@ -145,7 +145,7 @@ public class Dom
     static nint _context;
     static nint _webView;
 
-    static Dictionary<string, Action<JsonDocument>> Handlers = new();
+    static Dictionary<string, object> Handlers = new();
 
     static void HandleWebMessage(nint contentManager, nint jsResult, nint webView)
     {
@@ -157,19 +157,39 @@ public class Dom
             var s = Marshal.PtrToStringAuto(p);
             if (s is not null)
             {
-                var d = JsonDocument.Parse(s);
-                var m = d.RootElement.GetProperty(_handlerPropertyName).GetString();
-                if (m is not null)
+                var e = JsonSerializer.Deserialize<Event>(s, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (e is null)
                 {
-                    if (!Handlers.TryGetValue(m, out Action<JsonDocument>? handler))
+                    Error.WriteLine($"Could not deserialize event.");
+                }
+                else
+                {
+                    var m = e.DotNetMethod;
+                    if (m is not null)
                     {
-                        Error.WriteLine($"Handler \"{m}\" was not registered.");
+                        if (!Handlers.TryGetValue(m, out object? handler))
+                        {
+                            Error.WriteLine($"Handler \"{m}\" was not registered.");
+                        }
+                        else
+                        {
+                            if (handler is Action<MouseEvent>)
+                            {
+                                var me = JsonSerializer.Deserialize<MouseEvent>(s, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                ((Action<MouseEvent>)handler)(me!);
+                            }
+                            else if (handler is Action<Event>)
+                            {
+                                ((Action<Event>)handler)(e);
+                            }
+                            else
+                            {
+                                Error.WriteLine("Event was not implemented");
+                            }
+
+                        }
                     }
-                    else
-                    {
-                        handler(d);
-                    }
-                }      
+                }
             }
         }
 
@@ -241,7 +261,8 @@ public class Dom
         Dom.Emit($"{method}({string.Join(',', args)});");
     }
 
-    public static void AddEventListener(string selector, string evt, Action<JsonDocument> action, bool useCapture = false)
+    public static void AddEventListener<T>(string selector, string evt, Action<T> action, bool useCapture = false)
+        where T : Event
     {
         var id = action.GetHashCode().ToString();
         var name = $"_{id}";
@@ -261,7 +282,8 @@ public class Dom
         Invoke($"{selector}.addEventListener", $"\"{evt}\"", name, "{ passive: true }", useCapture.ToString().ToLower());
     }
 
-    public static void RemoveEventListener(string selector, string evt, Action<JsonDocument> action, bool useCapture = false)
+    public static void RemoveEventListener<T>(string selector, string evt, Action<T> action, bool useCapture = false)
+        where T : Event
     {
         var id = action.GetHashCode().ToString();
         

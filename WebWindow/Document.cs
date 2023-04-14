@@ -1,13 +1,13 @@
 using WebWindow;
 
-public class Document : Node
+public class Document : Node<Document>
 {
     public Document(string selector)
         : base(selector)
     { }
 
-    HTMLElement? _body;
-    public HTMLElement Body
+    HTMLBodyElement? _body;
+    public HTMLBodyElement Body
     {
         get
         {
@@ -20,14 +20,19 @@ public class Document : Node
         }
     }
 
-    public HTMLElement GetElementById(string id)
+    public T GetElementById<T>(string id)
+        where T : HTMLElement<T>
     {
         var selector = $"{Selector}.getElementById(\"{id}\")";
         var tagName = Dom.Read<string>($"{selector}.tagName");
 
         if (tagName == "INPUT")
         {
-            return new HTMLInputElement(selector);
+            return (T)(object)new HTMLInputElement(selector);
+        }
+        else if (tagName == "P")
+        {
+            return (T)(object)new HTMLParagraphElement(selector);
         }
         
         throw new NotImplementedException();

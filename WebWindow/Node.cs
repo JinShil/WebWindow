@@ -1,7 +1,8 @@
 
 namespace WebWindow;
 
-public abstract class Node : EventTarget
+public abstract class Node<T> : EventTarget<T>
+    where T : Node<T>
 {
     protected Node(string selector)
         : base(selector)

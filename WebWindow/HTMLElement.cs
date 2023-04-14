@@ -1,15 +1,21 @@
 
 namespace WebWindow;
 
-public abstract class HTMLElement : Element
+
+public abstract class HTMLElement<T> : Element<T>
+    where T : HTMLElement<T>
 {
     internal HTMLElement(string selector)
         : base(selector)
-    { }    
+    { 
+        _clickEvent = new("click", (T)this);
+    }    
 
-    public event Action<JsonDocument> Click
+    readonly EventHolder<MouseEvent> _clickEvent;
+
+    public event Action<T, MouseEvent> Click
     {
-        add => AddEventListener("click", value);
-        remove=> RemoveEventListener("click", value);
+        add => _clickEvent.AddHandler(value);
+        remove=> _clickEvent.RemoveHandler(value);
     }
 }

@@ -2,7 +2,8 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow;
 
-public abstract class Element : Node
+public abstract class Element<T> : Node<T>
+    where T : Element<T>
 {
     protected Element(string selector)
         : base(selector)

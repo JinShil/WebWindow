@@ -57,6 +57,7 @@ static class Program
             </head>
             <body>
                 <input id="range1" type="range" />
+                <p id="p1">paragraph</p>
             </body>
         </html>
         """, null);
@@ -71,17 +72,25 @@ static class Program
             Console.WriteLine(Dom.Document.Body.TagName);
             // Dom.Document.Body.InnerHTML = (Process.GetCurrentProcess().StartTime - DateTime.Now).ToString();
             
-            var range1 = (HTMLInputElement)Dom.Document.GetElementById("range1");
+            var range1 = Dom.Document.GetElementById<HTMLInputElement>("range1");
             range1.Input += OnInput;
 
             // for(int i = 0; i < 100000; i++)
             // {
             //     p.InnerHTML = i.ToString();
             // }
+
+            var p1 = Dom.Document.GetElementById<HTMLParagraphElement>("p1");
+            p1.Click += OnClick;
         }
     }
 
-    static void OnInput(HTMLInputElement el, JsonDocument e)
+    static void OnClick(HTMLParagraphElement el, MouseEvent e)
+    {
+        WriteLine(e.ClientX);
+    }
+
+    static void OnInput(HTMLInputElement el, Event e)
     {
         WriteLine(el.Value);
     }
