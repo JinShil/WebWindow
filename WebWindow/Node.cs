@@ -1,42 +1,9 @@
 
 namespace WebWindow;
 
-public abstract class Node
+public abstract class Node : EventTarget
 {
     protected Node(string selector)
-    {
-        Selector = selector;
-    }
-
-    protected string Selector { get; init; }
-
-    protected T Read<T>(string js)
-    {
-        return Dom.Read<T>($"{Selector}.{js}");
-    }
-
-    protected void Write<T>(string property, T value)
-    {
-        var sValue = value is null ? "null" : value.ToString();
-        if (value is not null && typeof(T) == typeof(string))
-        {
-            sValue = $"\"{sValue}\"";
-        }
-        Dom.Write($"{Selector}.{property}={sValue};");
-    }
-
-    protected void Invoke(string method, params string[] args)
-    {
-        Dom.Invoke(method, args);
-    }
-
-    protected void AddEventListener(string evt, Action<JsonDocument> action)
-    {
-        Dom.AddEventListener(Selector, evt, action);
-    }
-
-    protected void RemoveEventListener(string evt, Action<JsonDocument> action)
-    {
-        Dom.RemoveEventListener(Selector, evt, action);
-    }
+        : base(selector)
+    { }
 }

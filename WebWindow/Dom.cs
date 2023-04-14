@@ -241,7 +241,7 @@ public class Dom
         Dom.Emit($"{method}({string.Join(',', args)});");
     }
 
-    public static void AddEventListener(string selector, string evt, Action<JsonDocument> action, bool capture = false)
+    public static void AddEventListener(string selector, string evt, Action<JsonDocument> action, bool useCapture = false)
     {
         var id = action.GetHashCode().ToString();
         var name = $"_{id}";
@@ -258,14 +258,14 @@ public class Dom
         }
 
         // Make it `passive` because we don't have any way to call `preventDefault` anyway.
-        Invoke($"{selector}.addEventListener", $"\"{evt}\"", name, "{ passive: true }", capture.ToString().ToLower());
+        Invoke($"{selector}.addEventListener", $"\"{evt}\"", name, "{ passive: true }", useCapture.ToString().ToLower());
     }
 
-    public static void RemoveEventListener(string selector, string evt, Action<JsonDocument> action, bool capture = false)
+    public static void RemoveEventListener(string selector, string evt, Action<JsonDocument> action, bool useCapture = false)
     {
         var id = action.GetHashCode().ToString();
         
         var name = $"_{id}";
-        Invoke($"{selector}.removeEventListener", $"\"{evt}\"", name, capture.ToString().ToLower());
+        Invoke($"{selector}.removeEventListener", $"\"{evt}\"", name, useCapture.ToString().ToLower());
     }
 }
