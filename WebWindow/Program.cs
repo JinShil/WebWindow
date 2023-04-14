@@ -1,9 +1,6 @@
 ﻿using System.Runtime.InteropServices;
-using System.Diagnostics;
 
 namespace WebWindow;
-
-public delegate void JavascriptEventHandler();
 
 static class Program
 {

@@ -118,7 +118,7 @@ public class Dom
     static nint _context;
     static nint _webView;
 
-    static Dictionary<int, JavascriptEventHandler> Handlers = new();
+    static Dictionary<int, Action> Handlers = new();
 
     static void HandleWebMessage(nint contentManager, nint jsResult, nint webView)
     {
@@ -137,7 +137,7 @@ public class Dom
                 }
                 else
                 {
-                    if (!Handlers.TryGetValue(id, out JavascriptEventHandler? handler))
+                    if (!Handlers.TryGetValue(id, out Action? handler))
                     {
                         Error.WriteLine($"Handler \"{id}\" was not registered.");
                     }
@@ -218,17 +218,11 @@ public class Dom
         Dom.Emit($"{method}({string.Join(',', args)});");
     }
 
-    public static JavascriptEventHandler RegisterHandler(Action handler)
-    {
-        var jeh = new JavascriptEventHandler(handler);
-        Handlers.TryAdd(jeh.GetHashCode(), jeh);
-        return jeh;
-    }
-
     public static void AddEventListener(string selector, string evt, Action action)
     {
-        var jh = Dom.RegisterHandler(action);
-        var id = jh.GetHashCode();
+        var id = action.GetHashCode();
+        Handlers.TryAdd(id, action);
+
         var name = $"_{id}";
         Emit($$"""
             function {{name}}() 
@@ -241,8 +235,8 @@ public class Dom
 
     public static void RemoveEventListener(string selector, string evt, Action action)
     {
-        var jh = Dom.RegisterHandler(action);
-        var id = jh.GetHashCode();
+        var id = action.GetHashCode();
+        
         var name = $"_{id}";
         Invoke($"{selector}.removeEventListener", $"\"{evt}\"", name);
     }
