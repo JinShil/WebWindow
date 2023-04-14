@@ -30,12 +30,12 @@ public abstract class Node
         Dom.Invoke(method, args);
     }
 
-    protected void AddEventListener(string evt, Action action)
+    protected void AddEventListener(string evt, Action<JsonDocument> action)
     {
         Dom.AddEventListener(Selector, evt, action);
     }
 
-    protected void RemoveEventListener(string evt, Action action)
+    protected void RemoveEventListener(string evt, Action<JsonDocument> action)
     {
         Dom.RemoveEventListener(Selector, evt, action);
     }

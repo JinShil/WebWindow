@@ -83,9 +83,10 @@ static class Program
         }
     }
 
-    static void OnPClicked()
+    static void OnPClicked(JsonDocument e)
     {
-        WriteLine("P was clicked");
+        WriteLine(e.RootElement.GetProperty("clientX").GetInt32());
+        WriteLine(e.RootElement.ToString());
     }
 
     static void CloseWindow(nint instance, nint data)

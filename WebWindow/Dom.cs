@@ -113,12 +113,39 @@ public class Dom
         var webViewContentManager = webkit_web_view_get_user_content_manager(webView);
         webkit_user_content_manager_register_script_message_handler(webViewContentManager, "webview");
         g_signal_connect(webViewContentManager, "script-message-received::webview", Marshal.GetFunctionPointerForDelegate<void_nint_nint_nint>(HandleWebMessage), webView);
+
+        // Serializes javascript events to JSON.
+        Emit(
+            """
+            function stringifyEvent(e)
+            {
+                const obj = {};
+                for (let k in e)
+                {
+                    let v = e[k];
+                    if (v instanceof Node)
+                    {
+                        v = v.id;
+                    }
+                    else if (v instanceof Window)
+                    {
+                        v = "window";
+                    }
+                    
+                    obj[k] = v;
+                }
+
+                return JSON.stringify(obj);
+            }
+            """
+        );
     }
 
+    const string _handlerPropertyName = "dotnetMethod";
     static nint _context;
     static nint _webView;
 
-    static Dictionary<string, Action> Handlers = new();
+    static Dictionary<string, Action<JsonDocument>> Handlers = new();
 
     static void HandleWebMessage(nint contentManager, nint jsResult, nint webView)
     {
@@ -130,14 +157,19 @@ public class Dom
             var s = Marshal.PtrToStringAuto(p);
             if (s is not null)
             {
-                if (!Handlers.TryGetValue(s, out Action? handler))
+                var d = JsonDocument.Parse(s);
+                var m = d.RootElement.GetProperty(_handlerPropertyName).GetString();
+                if (m is not null)
                 {
-                    Error.WriteLine($"Handler \"{s}\" was not registered.");
-                }
-                else
-                {
-                    handler();
-                }               
+                    if (!Handlers.TryGetValue(m, out Action<JsonDocument>? handler))
+                    {
+                        Error.WriteLine($"Handler \"{m}\" was not registered.");
+                    }
+                    else
+                    {
+                        handler(d);
+                    }
+                }      
             }
         }
 
@@ -173,7 +205,6 @@ public class Dom
 
     static Future WriteAsync(string js)
     {
-        // Console.WriteLine(js);
         var f = new Future();
         webkit_web_view_run_javascript(_webView, js, nint.Zero, Marshal.GetFunctionPointerForDelegate<void_nint_nint_nint>(f.Finish), nint.Zero);
         return f;
@@ -210,22 +241,23 @@ public class Dom
         Dom.Emit($"{method}({string.Join(',', args)});");
     }
 
-    public static void AddEventListener(string selector, string evt, Action action)
+    public static void AddEventListener(string selector, string evt, Action<JsonDocument> action)
     {
         var id = action.GetHashCode().ToString();
         Handlers.TryAdd(id, action);
 
         var name = $"_{id}";
         Emit($$"""
-            function {{name}}() 
-            { 
-                window.webkit.messageHandlers.webview.postMessage("{{id}}"); 
+            function {{name}}(e) 
+            {
+                e.{{_handlerPropertyName}} = "{{id}}";
+                window.webkit.messageHandlers.webview.postMessage(stringifyEvent(e)); 
             }
             """);
         Invoke($"{selector}.addEventListener", $"\"{evt}\"", name);
     }
 
-    public static void RemoveEventListener(string selector, string evt, Action action)
+    public static void RemoveEventListener(string selector, string evt, Action<JsonDocument> action)
     {
         var id = action.GetHashCode().ToString();
         

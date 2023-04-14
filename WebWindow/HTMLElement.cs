@@ -7,7 +7,7 @@ public class HTMLElement : Element
         : base(selector)
     { }    
 
-    public event Action Click
+    public event Action<JsonDocument> Click
     {
         add => AddEventListener("click", value);
         remove=> RemoveEventListener("click", value);
