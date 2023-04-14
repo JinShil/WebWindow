@@ -8,11 +8,25 @@ public abstract class Element : Node
         : base(selector)
     { }
 
+    string? _tagName;
     public string TagName
     {
         get
         {
-            return Read<string>("tagName");
+            if (_tagName is null)
+            {
+                _tagName = Read<string>("tagName");
+            }
+
+            return _tagName;
+        }
+    }
+
+    public string Id
+    {
+        get
+        {
+            return Read<string>("id");
         }
     }
 
