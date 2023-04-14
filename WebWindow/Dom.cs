@@ -118,7 +118,7 @@ public class Dom
     static nint _context;
     static nint _webView;
 
-    static Dictionary<int, Action> Handlers = new();
+    static Dictionary<string, Action> Handlers = new();
 
     static void HandleWebMessage(nint contentManager, nint jsResult, nint webView)
     {
@@ -130,22 +130,14 @@ public class Dom
             var s = Marshal.PtrToStringAuto(p);
             if (s is not null)
             {
-                int id;
-                if (!int.TryParse(s, out id))
+                if (!Handlers.TryGetValue(s, out Action? handler))
                 {
-                    Error.WriteLine($"Could not parse \"{s}\" to an integer.");
+                    Error.WriteLine($"Handler \"{s}\" was not registered.");
                 }
                 else
                 {
-                    if (!Handlers.TryGetValue(id, out Action? handler))
-                    {
-                        Error.WriteLine($"Handler \"{id}\" was not registered.");
-                    }
-                    else
-                    {
-                        handler();
-                    }
-                }                
+                    handler();
+                }               
             }
         }
 
@@ -220,7 +212,7 @@ public class Dom
 
     public static void AddEventListener(string selector, string evt, Action action)
     {
-        var id = action.GetHashCode();
+        var id = action.GetHashCode().ToString();
         Handlers.TryAdd(id, action);
 
         var name = $"_{id}";
@@ -235,7 +227,7 @@ public class Dom
 
     public static void RemoveEventListener(string selector, string evt, Action action)
     {
-        var id = action.GetHashCode();
+        var id = action.GetHashCode().ToString();
         
         var name = $"_{id}";
         Invoke($"{selector}.removeEventListener", $"\"{evt}\"", name);
