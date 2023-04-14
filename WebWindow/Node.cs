@@ -27,11 +27,16 @@ public abstract class Node
 
     protected void Invoke(string method, params string[] args)
     {
-        Dom.Emit($"{method}({string.Join(',', args)});");
+        Dom.Invoke(method, args);
     }
 
-    protected void Emit(string js)
+    protected void AddEventListener(string evt, Action action)
     {
-        Dom.Emit(js);
+        Dom.AddEventListener(Selector, evt, action);
+    }
+
+    protected void RemoveEventListener(string evt, Action action)
+    {
+        Dom.RemoveEventListener(Selector, evt, action);
     }
 }

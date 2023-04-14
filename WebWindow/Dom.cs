@@ -109,10 +109,48 @@ public class Dom
     {
         _webView = webView;
         _context = g_main_context_default();
+
+        var webViewContentManager = webkit_web_view_get_user_content_manager(webView);
+        webkit_user_content_manager_register_script_message_handler(webViewContentManager, "webview");
+        g_signal_connect(webViewContentManager, "script-message-received::webview", Marshal.GetFunctionPointerForDelegate<void_nint_nint_nint>(HandleWebMessage), webView);
     }
 
     static nint _context;
     static nint _webView;
+
+    static Dictionary<int, JavascriptEventHandler> Handlers = new();
+
+    static void HandleWebMessage(nint contentManager, nint jsResult, nint webView)
+    {
+        var jsValue = webkit_javascript_result_get_js_value(jsResult);
+
+        if (jsc_value_is_string(jsValue)) 
+        {
+            var p = jsc_value_to_string(jsValue);
+            var s = Marshal.PtrToStringAuto(p);
+            if (s is not null)
+            {
+                int id;
+                if (!int.TryParse(s, out id))
+                {
+                    Error.WriteLine($"Could not parse \"{s}\" to an integer.");
+                }
+                else
+                {
+                    if (!Handlers.TryGetValue(id, out JavascriptEventHandler? handler))
+                    {
+                        Error.WriteLine($"Handler \"{id}\" was not registered.");
+                    }
+                    else
+                    {
+                        handler();
+                    }
+                }                
+            }
+        }
+
+        webkit_javascript_result_unref(jsResult);
+    }
 
     public static T Read<T>(string js)
     {
@@ -173,5 +211,39 @@ public class Dom
 
             return _document;
         }
+    }
+
+    public static void Invoke(string method, params string[] args)
+    {
+        Dom.Emit($"{method}({string.Join(',', args)});");
+    }
+
+    public static JavascriptEventHandler RegisterHandler(Action handler)
+    {
+        var jeh = new JavascriptEventHandler(handler);
+        Handlers.TryAdd(jeh.GetHashCode(), jeh);
+        return jeh;
+    }
+
+    public static void AddEventListener(string selector, string evt, Action action)
+    {
+        var jh = Dom.RegisterHandler(action);
+        var id = jh.GetHashCode();
+        var name = $"_{id}";
+        Emit($$"""
+            function {{name}}() 
+            { 
+                window.webkit.messageHandlers.webview.postMessage("{{id}}"); 
+            }
+            """);
+        Invoke($"{selector}.addEventListener", $"\"{evt}\"", name);
+    }
+
+    public static void RemoveEventListener(string selector, string evt, Action action)
+    {
+        var jh = Dom.RegisterHandler(action);
+        var id = jh.GetHashCode();
+        var name = $"_{id}";
+        Invoke($"{selector}.removeEventListener", $"\"{evt}\"", name);
     }
 }

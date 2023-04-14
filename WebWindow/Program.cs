@@ -39,26 +39,18 @@ static class Program
         // Create the parent window
         var window = gtk_window_new(GtkWindowType.GTK_WINDOW_TOPLEVEL);
         gtk_window_set_default_size(window, 1024, 768);
-
         g_signal_connect(window, "destroy", Marshal.GetFunctionPointerForDelegate<void_nint_nint>(CloseWindow), nint.Zero);
 
         // Add the WebView
         var webView = webkit_web_view_new();
         gtk_container_add(window, webView);
+        g_signal_connect(webView, "load-changed", Marshal.GetFunctionPointerForDelegate<void_nint_int_nint>(LoadChanged), webView);
 
         gtk_widget_show_all(window);
 
-        var webViewContentManager = webkit_web_view_get_user_content_manager(webView);
-        webkit_user_content_manager_register_script_message_handler(webViewContentManager, "webview");
-        g_signal_connect(webViewContentManager, "script-message-received::webview", Marshal.GetFunctionPointerForDelegate<void_nint_nint_nint>(HandleWebMessage), webView);
-        g_signal_connect(webView, "load-changed", Marshal.GetFunctionPointerForDelegate<void_nint_int_nint>(LoadChanged), webView);
-        
-        
         // Allow opening developer tools
         var settings = webkit_web_view_get_settings(webView);
         webkit_settings_set_enable_developer_extras(settings, true);
-
-        
 
         webkit_web_view_load_html(webView, 
         """
@@ -74,8 +66,6 @@ static class Program
         """, null);
     }
 
-    
-
     static void LoadChanged(nint webView, int loadEvent, nint data)
     {
         if (loadEvent == 3)
@@ -87,7 +77,7 @@ static class Program
             
             var p = Dom.Document.GetElementById("testp");
 
-            p.Click += RegisterHandler(OnPClicked);
+            p.Click += OnPClicked;
 
             // for(int i = 0; i < 100000; i++)
             // {
@@ -99,47 +89,6 @@ static class Program
     static void OnPClicked()
     {
         WriteLine("P was clicked");
-    }
-
-    static Dictionary<int, JavascriptEventHandler> Handlers = new();
-
-    static JavascriptEventHandler RegisterHandler(Action handler)
-    {
-        var jeh = new JavascriptEventHandler(handler);
-        Handlers.TryAdd(jeh.GetHashCode(), jeh);
-        return jeh;
-    }
-
-    static void HandleWebMessage(nint contentManager, nint jsResult, nint webView)
-    {
-        var jsValue = webkit_javascript_result_get_js_value(jsResult);
-
-        if (jsc_value_is_string(jsValue)) 
-        {
-            var p = jsc_value_to_string(jsValue);
-            var s = Marshal.PtrToStringAuto(p);
-            if (s is not null)
-            {
-                int id;
-                if (!int.TryParse(s, out id))
-                {
-                    Error.WriteLine($"Could not parse \"{s}\" to an integer.");
-                }
-                else
-                {
-                    if (!Handlers.TryGetValue(id, out JavascriptEventHandler? handler))
-                    {
-                        Error.WriteLine($"Handler \"{id}\" was not registered.");
-                    }
-                    else
-                    {
-                        handler();
-                    }
-                }                
-            }
-        }
-
-        webkit_javascript_result_unref(jsResult);
     }
 
     static void CloseWindow(nint instance, nint data)
