@@ -227,7 +227,7 @@ public class Dom
     {
         get
         {
-            if (_document == null)
+            if (_document is null)
             {
                 _document = new Document("document");
             }
