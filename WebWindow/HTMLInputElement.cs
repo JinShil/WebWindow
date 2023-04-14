@@ -18,9 +18,45 @@ public class HTMLInputElement : HTMLElement
         set => Write<string>("value", value);
     }
 
-    public event Action<JsonDocument> Input
+    class EventHolder<T>
+        where T : EventTarget
     {
-        add => AddEventListener("input", value);
-        remove => RemoveEventListener("input", value);
+        public EventHolder(T element, Action<T, JsonDocument> handler)
+        {
+            _element = element;
+            _handler = handler;
+        }
+
+        readonly T _element;
+        readonly Action<T, JsonDocument> _handler;
+
+        public void CallHandler(JsonDocument e)
+        {
+            _handler(_element, e);
+        }
+    }
+
+    EventHolder<HTMLInputElement>? _inputEventHolder;
+
+    public event Action<HTMLInputElement, JsonDocument> Input
+    {
+        add
+        {
+            if (_inputEventHolder is null)
+            {
+                _inputEventHolder = new EventHolder<HTMLInputElement>(this, value);
+            }
+
+            AddEventListener("input", _inputEventHolder.CallHandler);
+        }
+        remove
+        {
+            if (_inputEventHolder is null)
+            {
+                return;
+            }
+
+            RemoveEventListener("input", _inputEventHolder.CallHandler);
+        }
     }
 }

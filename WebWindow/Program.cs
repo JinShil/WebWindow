@@ -81,11 +81,9 @@ static class Program
         }
     }
 
-    static void OnInput(JsonDocument e)
+    static void OnInput(HTMLInputElement el, JsonDocument e)
     {
-        var id = e.RootElement.GetProperty("srcElement").GetString()!;
-        var range1 = (HTMLInputElement)Dom.Document.GetElementById(id);
-        WriteLine(range1.Value);
+        WriteLine(el.Value);
     }
 
     static void CloseWindow(nint instance, nint data)
