@@ -22,12 +22,10 @@ public abstract class Element : Node
         }
     }
 
-    public string Id
+    public string? Id
     {
-        get
-        {
-            return Read<string>("id");
-        }
+        get => Read<string?>("id");
+        set => Write<string?>("id", value);
     }
 
     public string InnerHTML
