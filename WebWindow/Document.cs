@@ -13,7 +13,7 @@ public class Document : Node
         {
             if (_body is null)
             {
-                _body = new HTMLElement($"{Selector}.body");
+                _body = new HTMLBodyElement($"{Selector}.body");
             }
 
             return _body;
@@ -22,6 +22,14 @@ public class Document : Node
 
     public HTMLElement GetElementById(string id)
     {
-        return new HTMLElement($"{Selector}.getElementById(\"{id}\")");
+        var selector = $"{Selector}.getElementById(\"{id}\")";
+        var tagName = Dom.Read<string>($"{selector}.tagName");
+
+        if (tagName == "INPUT")
+        {
+            return new HTMLInputElement(selector);
+        }
+        
+        throw new NotImplementedException();
     }
 }

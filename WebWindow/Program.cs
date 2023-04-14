@@ -23,7 +23,7 @@ static class Program
 
         while(running)
         {
-            g_main_context_iteration(context, true);
+             g_main_context_iteration(context, true);
         }
 
         g_object_unref(app);
@@ -56,9 +56,7 @@ static class Program
                 <title>This is the title</title>
             </head>
             <body>
-                Working
-                <p id="p1">p1</p>
-                <p id="p2">p2</p>
+                <input id="range1" type="range" />
             </body>
         </html>
         """, null);
@@ -73,22 +71,21 @@ static class Program
             Console.WriteLine(Dom.Document.Body.TagName);
             // Dom.Document.Body.InnerHTML = (Process.GetCurrentProcess().StartTime - DateTime.Now).ToString();
             
-            var p1 = Dom.Document.GetElementById("p1");
-            var p2 = Dom.Document.GetElementById("p2");
-
-            p1.Click += OnPClicked;
-            p2.Click += OnPClicked;
+            var range1 = (HTMLInputElement)Dom.Document.GetElementById("range1");
+            range1.Input += OnInput;
 
             // for(int i = 0; i < 100000; i++)
             // {
-            //     p.InnerHTML = i.ToString();5
+            //     p.InnerHTML = i.ToString();
             // }
         }
     }
 
-    static void OnPClicked(JsonDocument e)
+    static void OnInput(JsonDocument e)
     {
-        WriteLine(e.RootElement.GetProperty("clientX").GetInt32());
+        var id = e.RootElement.GetProperty("srcElement").GetString()!;
+        var range1 = (HTMLInputElement)Dom.Document.GetElementById(id);
+        WriteLine(range1.Value);
     }
 
     static void CloseWindow(nint instance, nint data)
