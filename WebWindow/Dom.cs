@@ -244,16 +244,19 @@ public class Dom
     public static void AddEventListener(string selector, string evt, Action<JsonDocument> action)
     {
         var id = action.GetHashCode().ToString();
-        Handlers.TryAdd(id, action);
-
         var name = $"_{id}";
-        Emit($$"""
-            function {{name}}(e) 
-            {
-                e.{{_handlerPropertyName}} = "{{id}}";
-                window.webkit.messageHandlers.webview.postMessage(stringifyEvent(e)); 
-            }
-            """);
+
+        if (Handlers.TryAdd(id, action))
+        {
+            Emit($$"""
+                function {{name}}(e) 
+                {
+                    e.{{_handlerPropertyName}} = "{{id}}";
+                    window.webkit.messageHandlers.webview.postMessage(stringifyEvent(e)); 
+                }
+                """);
+        }
+
         Invoke($"{selector}.addEventListener", $"\"{evt}\"", name);
     }
 

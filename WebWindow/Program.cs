@@ -57,7 +57,8 @@ static class Program
             </head>
             <body>
                 Working
-                <p id="testp">paragraph</p>
+                <p id="p1">p1</p>
+                <p id="p2">p2</p>
             </body>
         </html>
         """, null);
@@ -72,9 +73,11 @@ static class Program
             Console.WriteLine(Dom.Document.Body.TagName);
             // Dom.Document.Body.InnerHTML = (Process.GetCurrentProcess().StartTime - DateTime.Now).ToString();
             
-            var p = Dom.Document.GetElementById("testp");
+            var p1 = Dom.Document.GetElementById("p1");
+            var p2 = Dom.Document.GetElementById("p2");
 
-            p.Click += OnPClicked;
+            p1.Click += OnPClicked;
+            p2.Click += OnPClicked;
 
             // for(int i = 0; i < 100000; i++)
             // {
@@ -86,7 +89,6 @@ static class Program
     static void OnPClicked(JsonDocument e)
     {
         WriteLine(e.RootElement.GetProperty("clientX").GetInt32());
-        WriteLine(e.RootElement.ToString());
     }
 
     static void CloseWindow(nint instance, nint data)
