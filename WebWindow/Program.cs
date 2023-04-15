@@ -1,17 +1,15 @@
-﻿using System.Runtime.InteropServices;
-
-namespace WebWindow;
+﻿namespace WebWindow;
 
 static class Program
 {
-    delegate void void_nint_nint(nint arg0, nint arg1);
-    delegate void void_nint_nint_nint(nint arg0, nint arg1, nint arg2);
-    delegate void void_nint_int_nint(nint arg0, int arg1, nint arg2);
+    delegate void DestroyHandler(nint widget, nint data);
+    delegate void ActivateHandler(nint app, nint data);
+    delegate void LoadChangedHandler(nint arg0, WebkitLoadEvent arg1, nint data);
 
     static int Main()
     {
         var app = gtk_application_new("WebWindow.Test", ApplicationFlags.NONE);
-        g_signal_connect(app, "activate", Marshal.GetFunctionPointerForDelegate<void_nint_nint>(OnActivate), nint.Zero);
+        g_signal_connect(app, "activate", FunctionPointer<ActivateHandler>(Activate), nint.Zero);
 
         var status = g_application_run(app, 0, nint.Zero);
 
@@ -20,17 +18,17 @@ static class Program
         return status;
     }
 
-    static void OnActivate(nint app, nint data)
+    static void Activate(nint app, nint data)
     {
         // Create the parent window
         var window = gtk_application_window_new(app);
         gtk_window_set_default_size(window, 1024, 768);
-        g_signal_connect(window, "destroy", Marshal.GetFunctionPointerForDelegate<void_nint_nint>(CloseWindow), app);
+        g_signal_connect(window, "destroy", FunctionPointer<DestroyHandler>(CloseWindow), app);
 
         // Add the WebView
         var webView = webkit_web_view_new();
         gtk_container_add(window, webView);
-        g_signal_connect(webView, "load-changed", Marshal.GetFunctionPointerForDelegate<void_nint_int_nint>(LoadChanged), webView);
+        g_signal_connect(webView, "load-changed", FunctionPointer<LoadChangedHandler>(LoadChanged), webView);
 
         gtk_widget_show_all(window);
 
@@ -52,25 +50,33 @@ static class Program
         """, null);
     }
 
-    static void LoadChanged(nint webView, int loadEvent, nint data)
+    static void LoadChanged(nint webView, WebkitLoadEvent loadEvent, nint data)
     {
-        if (loadEvent == 3)
+        if (loadEvent == WebkitLoadEvent.WEBKIT_LOAD_FINISHED)
         {
-            Dom.Initialize(webView);
-            
-            Console.WriteLine(Dom.Document.Body.TagName);
-            // Dom.Document.Body.InnerHTML = (Process.GetCurrentProcess().StartTime - DateTime.Now).ToString();
-            
-            var range1 = Dom.Document.GetElementById<HTMLInputElement>("range1");
-            range1.Input += OnInput;
+            try
+            {
+                Dom.Initialize(webView);
+                
+                Console.WriteLine(Dom.Document.Body.TagName);
+                
+                var range1 = Dom.Document.GetElementById<HTMLInputElement>("range1");
+                range1.Input += OnInput;
 
-            // for(int i = 0; i < 100000; i++)
-            // {
-            //     p.InnerHTML = i.ToString();
-            // }
+                
 
-            var p1 = Dom.Document.GetElementById<HTMLParagraphElement>("p1");
-            p1.Click += OnClick;
+                var p1 = Dom.Document.GetElementById<HTMLParagraphElement>("p1");
+                p1.Click += OnClick;
+
+                for(int i = 0; i < 100000; i++)
+                {
+                    p1.InnerHTML = i.ToString();
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 

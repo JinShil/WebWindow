@@ -127,6 +127,14 @@ public static class WebKit
         WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_END = 1
     }
 
+    public enum WebkitLoadEvent
+    {
+        WEBKIT_LOAD_STARTED = 0,
+        WEBKIT_LOAD_REDIRECTED = 1,
+        WEBKIT_LOAD_COMMITTED = 2,
+        WEBKIT_LOAD_FINISHED = 3
+    }
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void WebKitURISchemeRequestCallback(nint instance, nint data);
 

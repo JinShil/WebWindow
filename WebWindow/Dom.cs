@@ -4,7 +4,7 @@ namespace WebWindow;
 
 public class Dom
 {
-    delegate void void_nint_nint_nint(nint arg0, nint arg1, nint arg2);
+    delegate void FinishHandler(nint arg0, nint arg1, nint arg2);
 
     class Future
     {
@@ -38,8 +38,7 @@ public class Dom
 
             if (ErrorMessage is not null)
             {
-                // throw new Exception(ErrorMessage);
-                Error.WriteLine(ErrorMessage);
+                throw new Exception(ErrorMessage);
             }
         }
     }
@@ -89,8 +88,7 @@ public class Dom
 
             if (ErrorMessage is not null)
             {
-                // throw new Exception(ErrorMessage);
-                Error.WriteLine(ErrorMessage);
+                throw new Exception(ErrorMessage);
             }
         }
 
@@ -112,7 +110,7 @@ public class Dom
 
         var webViewContentManager = webkit_web_view_get_user_content_manager(webView);
         webkit_user_content_manager_register_script_message_handler(webViewContentManager, "webview");
-        g_signal_connect(webViewContentManager, "script-message-received::webview", Marshal.GetFunctionPointerForDelegate<void_nint_nint_nint>(HandleWebMessage), webView);
+        g_signal_connect(webViewContentManager, "script-message-received::webview", FunctionPointer<FinishHandler>(HandleWebMessage), webView);
 
         // Serializes javascript events to JSON.
         Emit(
@@ -225,21 +223,21 @@ public class Dom
     static Future<T> ReadAsync<T>(string js)
     {
         var f = new Future<T>();
-        webkit_web_view_run_javascript(_webView, js, nint.Zero, Marshal.GetFunctionPointerForDelegate<void_nint_nint_nint>(f.Finish), nint.Zero);
+        webkit_web_view_run_javascript(_webView, js, nint.Zero, FunctionPointer<FinishHandler>(f.Finish), nint.Zero);
         return f;
     }
 
     static Future WriteAsync(string js)
     {
         var f = new Future();
-        webkit_web_view_run_javascript(_webView, js, nint.Zero, Marshal.GetFunctionPointerForDelegate<void_nint_nint_nint>(f.Finish), nint.Zero);
+        webkit_web_view_run_javascript(_webView, js, nint.Zero, FunctionPointer<FinishHandler>(f.Finish), nint.Zero);
         return f;
     }
 
     static Future EmitAsync(string js)
     {
         var f = new Future();
-        webkit_web_view_run_javascript(_webView, js, nint.Zero, Marshal.GetFunctionPointerForDelegate<void_nint_nint_nint>(f.Finish), nint.Zero);
+        webkit_web_view_run_javascript(_webView, js, nint.Zero, FunctionPointer<FinishHandler>(f.Finish), nint.Zero);
         return f;
     }
 
