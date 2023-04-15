@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow.Native;
 
-public static class WebKit
+internal static class WebKit
 {
     public const string FilePath = "libwebkit2gtk-4.0.so.37";
 
