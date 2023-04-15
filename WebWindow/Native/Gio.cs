@@ -2,9 +2,9 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow.Native;
 
-public static class Gio
+internal static class Gio
 {
-    public const string FilePath = "libgio-2.0.so.0";
+    const string FilePath = "libgio-2.0.so.0";
 
     const int G_PRIORITY_DEFAULT_IDLE = 200;
 

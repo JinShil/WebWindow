@@ -2,9 +2,9 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow.Native;
 
-public static class Gtk
+internal static class Gtk
 {
-    public const string FilePath = "libgtk-3.so.0";
+    const string FilePath = "libgtk-3.so.0";
 
     public enum GtkWindowType : int
     {

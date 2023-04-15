@@ -2,15 +2,18 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow.Native;
 
-public static class GObject
+internal static class GObject
 {
-    public const string FilePath = "libgobject-2.0.so.0";
+    const string FilePath = "libgobject-2.0.so.0";
 
-    public struct GError 
+    public struct GError
     {
-        public uint domain;
-        public int code;
-        public nint message;
+        public GError()
+        { }
+
+        public uint domain = 0;
+        public int code = 0;
+        public nint message = nint.Zero;
     }
 
     [DllImport(FilePath)]
