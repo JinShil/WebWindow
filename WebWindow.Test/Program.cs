@@ -60,7 +60,7 @@ static class Program
             range1.Input += OnInput;
 
             var p1 = document.GetElementById<HTMLParagraphElement>("p1");
-            p1.Click += OnClick;
+            p1.InnerText = $"Startup Time:  {(DateTime.Now - System.Diagnostics.Process.GetCurrentProcess().StartTime)}";
 
             var fsButton = document.GetElementById<HTMLButtonElement>("fs_button");
             fsButton.Click += ToggleFullscreen;
@@ -97,11 +97,6 @@ static class Program
         {
             _webWindow.EnterFullscreen();
         }
-    }
-
-    static void OnClick(HTMLParagraphElement el, MouseEvent e)
-    {
-        WriteLine(e.ClientX);
     }
 
     static void OnInput(HTMLInputElement el, Event e)

@@ -11,6 +11,27 @@ This solution does not use Razor commponents.  Instead it simply exposes the Web
 ## Run the Demonstration
 ```
 git clone https://github.com/JinShil/WebWindow.git
-cd WebWindow.Test
+cd WebWindow/WebWindow.Test
 dotnet run
+```
+
+## Run the Demonstration with Native AoT
+You may need to install these dependencies:
+```
+sudo apt-get install clang zlib1g-dev
+```
+Then publish the project with Native AoT.
+```
+cd WebWindow/WebWindow.Test
+dotnet publish -r linux-x64 -c Release --self-contained=true -p:PublishAot=true -p:StripSymbols=true
+```
+
+If you get an error about not being able to find `-lstdc++` try this and then run the publish command again.
+```
+sudo apt install libstdc++-12-dev
+```
+
+Then run the resulting executable:
+```
+./bin/Release/net7.0/linux-x64/publish/WebWindow.Test
 ```
