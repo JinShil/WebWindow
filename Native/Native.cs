@@ -123,6 +123,9 @@ public static class Gtk
     public static extern void gtk_main_quit();
 
     [DllImport(FilePath)]
+    public static extern void gtk_window_close(nint window);
+
+    [DllImport(FilePath)]
     public static extern nint gtk_widget_get_window(nint widget);
 
     [DllImport(FilePath)]

@@ -46,6 +46,7 @@ static class Program
                 <input id="range1" type="range" />
                 <p id="p1">paragraph</p>
                 <button id="fs_button">Toggle Fullscreen</button>
+                <button id="close_button">Close</button>
             </body>
         </html>
         """, null);
@@ -76,6 +77,8 @@ static class Program
                 var fsButton = Dom.Document.GetElementById<HTMLButtonElement>("fs_button");
                 fsButton.Click += ToggleFullscreen;
 
+                var closeButton = Dom.Document.GetElementById<HTMLButtonElement>("close_button");
+                closeButton.Click += CloseWindow;
                 // for(int i = 0; i < 100000; i++)
                 // {
                 //     p1.InnerHTML = i.ToString();
@@ -86,6 +89,11 @@ static class Program
                 Console.WriteLine(ex.Message);
             }
         }
+    }
+
+    static void CloseWindow(HTMLButtonElement el, MouseEvent e)
+    {
+        gtk_window_close(_window);
     }
 
     static void ToggleFullscreen(HTMLButtonElement el, MouseEvent e)
