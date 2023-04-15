@@ -8,7 +8,6 @@ internal static class JSInterop
 
     class Future
     {
-        nint _context = g_main_context_default();
         bool _done = false;
         public string? ErrorMessage { get; protected set;} = null;
 
@@ -165,7 +164,6 @@ internal static class JSInterop
                             {
                                 Error.WriteLine("Event was not implemented");
                             }
-
                         }
                     }
                 }
