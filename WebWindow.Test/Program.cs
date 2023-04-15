@@ -22,31 +22,40 @@ static class Program
 
     static void Activated(WebWindow webWindow)
     {
-        // Load the initial HTML content
-        var asm = Assembly.GetExecutingAssembly();
-        string resourceName = $"{asm.GetName().Name}.index.html";
-        var stream = asm.GetManifestResourceStream(resourceName);
-        if (stream is null)
+        try
         {
-            // throw new Exception($"Could not locate embedded resource \"{resourceName}\"");
-            Error.WriteLine($"Could not locate embedded resource \"{resourceName}\"");
-        }
-        else
-        {
-            using (var sr = new StreamReader(stream))
+            _webWindow.DeveloperExtrasAreEnabled = true;
+
+            // Load the initial HTML content
+            var asm = Assembly.GetExecutingAssembly();
+            string resourceName = $"{asm.GetName().Name}.index.html";
+            var stream = asm.GetManifestResourceStream(resourceName);
+            if (stream is null)
             {
-                _webWindow.LoadHTML(sr.ReadToEnd());
+                // throw new Exception($"Could not locate embedded resource \"{resourceName}\"");
+                Error.WriteLine($"Could not locate embedded resource \"{resourceName}\"");
             }
+            else
+            {
+                using (var sr = new StreamReader(stream))
+                {
+                    _webWindow.LoadHTML(sr.ReadToEnd());
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            Error.WriteLine(ex.Message);
         }
     }
 
     static void Loaded(WebWindow webWindow)
     {
-        // The content has been loaded. Wire things up
         try
         {
+            // The content has been loaded. Wire things up
             document = new Document();
-            
+                
             var range1 = document.GetElementById<HTMLInputElement>("range1");
             range1.Input += OnInput;
 
@@ -69,7 +78,7 @@ static class Program
         }
         catch(Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Error.WriteLine(ex.Message);
         }
     }
 
