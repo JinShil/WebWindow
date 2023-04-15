@@ -42,6 +42,10 @@ public class Document : Node<Document>
         {
             return (T)(object)new HTMLParagraphElement(selector);
         }
+        else if (tagName == "SPAN")
+        {
+            return (T)(object)new HTMLSpanElement(selector);
+        }
         
         throw new NotImplementedException();
     }

@@ -43,7 +43,7 @@ static class Program
                 <title>This is the title</title>
             </head>
             <body>
-                <input id="range1" type="range" />
+                <div><input id="range1" type="range" /><span id="range_value"></span></dive>
                 <p id="p1">paragraph</p>
                 <button id="fs_button">Toggle Fullscreen</button>
                 <button id="close_button">Close</button>
@@ -59,6 +59,8 @@ static class Program
     {
         g_application_quit(app);
     }
+
+    static HTMLSpanElement rangeValue = default!;
 
     static void LoadChanged(nint webView, WebkitLoadEvent loadEvent, nint data)
     {
@@ -83,6 +85,9 @@ static class Program
                 // {
                 //     p1.InnerHTML = i.ToString();
                 // }
+
+                rangeValue = Dom.Document.GetElementById<HTMLSpanElement>("range_value");
+                rangeValue.InnerHTML = range1.Value;
             }
             catch(Exception ex)
             {
@@ -119,6 +124,6 @@ static class Program
 
     static void OnInput(HTMLInputElement el, Event e)
     {
-        WriteLine(el.Value);
+        rangeValue.InnerHTML = el.Value;
     }
 }
