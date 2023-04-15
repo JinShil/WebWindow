@@ -1,4 +1,6 @@
-﻿namespace WebWindow;
+﻿using System.Reflection;
+
+namespace WebWindow;
 
 static class Program
 {
@@ -17,21 +19,13 @@ static class Program
 
     static void Activated(WebWindow webWindow)
     {
-        _webWindow.LoadHTML(
-            """
-            <html>
-                <head>
-                    <title>This is the title</title>
-                </head>
-                <body>
-                    <div><input id="range1" type="range" /><span id="range_value"></span></dive>
-                    <p id="p1">paragraph</p>
-                    <button id="fs_button">Toggle Fullscreen</button>
-                    <button id="close_button">Close</button>
-                </body>
-            </html>
-            """
-        );
+        var asm = Assembly.GetEntryAssembly()!;
+        var stream = asm.GetManifestResourceStream("WebWindow.index.html")!;
+        using (var sr = new StreamReader(stream))
+        {
+            _webWindow.LoadHTML(sr.ReadToEnd());
+        }
+        
     }
 
     static void Loaded(WebWindow webWindow)
