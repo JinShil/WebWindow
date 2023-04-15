@@ -61,6 +61,8 @@ public abstract class EventTarget<T>
             set
             {
                 var sValue = value is null ? "null" : value.ToString();
+
+                // Wrap value in double quotes if of type string
                 if (value is not null && typeof(TValue) == typeof(string))
                 {
                     sValue = $"\"{sValue}\"";
