@@ -139,7 +139,6 @@ public class Dom
         );
     }
 
-    const string _handlerPropertyName = "dotnetMethod";
     static nint _context;
     static nint _webView;
 
@@ -276,7 +275,7 @@ public class Dom
             Emit($$"""
                 function {{name}}(e) 
                 {
-                    e.{{_handlerPropertyName}} = "{{id}}";
+                    e.{{nameof(Event.DotNetMethod)}} = "{{id}}";
                     window.webkit.messageHandlers.webview.postMessage(stringifyEvent(e)); 
                 }
                 """);
