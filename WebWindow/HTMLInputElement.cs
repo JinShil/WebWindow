@@ -6,18 +6,22 @@ public class HTMLInputElement : HTMLElement<HTMLInputElement>
     internal HTMLInputElement(string selector)
         : base(selector)
     { 
-        _inputEventHolder = new("input", this);
+        _inputEventHolder = new(this, "input");
+        _type = new(this, "type");
+        _value = new(this, "value");
     }    
 
+    readonly Property<string> _type;
     public string Type
     {
-        get => Read<string>("type");
+        get => _type.Value;
     }
 
+    readonly Property<string> _value;
     public string Value
     {
-        get => Read<string>("value");
-        set => Write<string>("value", value);
+        get => _value.Value;
+        set => _value.Value = value;
     }
 
     readonly EventHolder<Event> _inputEventHolder;

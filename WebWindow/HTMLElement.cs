@@ -8,7 +8,8 @@ public abstract class HTMLElement<T> : Element<T>
     internal HTMLElement(string selector)
         : base(selector)
     { 
-        _clickEvent = new("click", (T)this);
+        _clickEvent = new((T)this, "click");
+        _innerText = new((T)this, "innerText");
     }    
 
     readonly EventHolder<MouseEvent> _clickEvent;
@@ -19,9 +20,10 @@ public abstract class HTMLElement<T> : Element<T>
         remove=> _clickEvent.RemoveHandler(value);
     }
 
+    readonly Property<string> _innerText;
     public string InnerText
     {
-        get => Read<string>("innerText");
-        set => Write<string>("innerText", value);
+        get => _innerText.Value;
+        set => _innerText.Value = value;
     }
 }

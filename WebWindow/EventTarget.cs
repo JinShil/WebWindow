@@ -7,7 +7,7 @@ public abstract class EventTarget<T>
     protected class EventHolder<TEvent>
         where TEvent : Event
     {
-        public EventHolder(string evt, T element)
+        public EventHolder(T element, string evt)
         {
             _event = evt;
             _element = element;
@@ -31,7 +31,7 @@ public abstract class EventTarget<T>
             _handlers.Add(handler);
             if (_handlers.Count == 1)
             {
-                _element.AddEventListener<TEvent>(_event, CallHandlers);
+                JSInterop.AddEventListener<TEvent>(_element.Selector, _event, CallHandlers);
             }
         }
 
@@ -39,22 +39,36 @@ public abstract class EventTarget<T>
         {
             if (_handlers.Count == 1)
             {
-                _element.RemoveEventListener<TEvent>(_event, CallHandlers);
+                JSInterop.RemoveEventListener<TEvent>(_element.Selector, _event, CallHandlers);
             }
             _handlers.Remove(handler);
         }
     }
 
-    void AddEventListener<TEvent>(string evt, Action<TEvent> action, bool useCapture = false)
-        where TEvent : Event
+    protected class Property<TValue>
     {
-        JSInterop.AddEventListener(Selector, evt, action, useCapture);
-    }
+        public Property(T element, string propertyName)
+        {
+            _element = element;
+            _propertyName = propertyName;
+        }
 
-    void RemoveEventListener<TEvent>(string evt, Action<TEvent> action, bool useCapture = false)
-        where TEvent : Event
-    {
-        JSInterop.RemoveEventListener(Selector, evt, action, useCapture);
+        readonly T _element;
+        readonly string _propertyName;
+        public TValue Value
+        {
+            get => JSInterop.Read<TValue>($"{_element.Selector}.{_propertyName}");
+            set
+            {
+                var sValue = value is null ? "null" : value.ToString();
+                if (value is not null && typeof(TValue) == typeof(string))
+                {
+                    sValue = $"\"{sValue}\"";
+                }
+                
+                JSInterop.Write($"{_element.Selector}.{_propertyName}={sValue};");
+            }
+        }
     }
 
     protected EventTarget(string selector)
@@ -63,22 +77,6 @@ public abstract class EventTarget<T>
     }
 
     protected string Selector { get; init; }
-
-    protected TValue Read<TValue>(string js)
-    {
-        return JSInterop.Read<TValue>($"{Selector}.{js}");
-    }
-
-    protected void Write<TValue>(string property, TValue value)
-    {
-        var sValue = value is null ? "null" : value.ToString();
-        if (value is not null && typeof(TValue) == typeof(string))
-        {
-            sValue = $"\"{sValue}\"";
-        }
-        
-        JSInterop.Write($"{Selector}.{property}={sValue};");
-    }
 
     protected void Invoke(string method, params string[] args)
     {

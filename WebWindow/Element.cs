@@ -7,31 +7,29 @@ public abstract class Element<T> : Node<T>
 {
     protected Element(string selector)
         : base(selector)
-    { }
+    { 
+        _tagName = new((T)this, "tagName");
+        _id = new((T)this, "id");
+        _innerHTML = new((T)this, "innerHTML");
+    }
 
-    string? _tagName;
+    readonly Property<string> _tagName;
     public string TagName
     {
-        get
-        {
-            if (_tagName is null)
-            {
-                _tagName = Read<string>("tagName");
-            }
-
-            return _tagName;
-        }
+        get => _tagName.Value;
     }
 
-    public string? Id
+    readonly Property<string> _id;
+    public string Id
     {
-        get => Read<string?>("id");
-        set => Write<string?>("id", value);
+        get => _id.Value;
+        set => _id.Value = value;
     }
 
+    readonly Property<string> _innerHTML;
     public string InnerHTML
     {
-        get => Read<string>("innerHTML");
-        set => Write<string>("innerHTML", value);
+        get => _innerHTML.Value;
+        set => _innerHTML.Value = value;
     }
 }
