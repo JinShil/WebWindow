@@ -87,7 +87,7 @@ static class Program
                 // }
 
                 rangeValue = Dom.Document.GetElementById<HTMLSpanElement>("range_value");
-                rangeValue.InnerHTML = range1.Value;
+                rangeValue.InnerText = range1.Value;
             }
             catch(Exception ex)
             {
@@ -124,6 +124,6 @@ static class Program
 
     static void OnInput(HTMLInputElement el, Event e)
     {
-        rangeValue.InnerHTML = el.Value;
+        rangeValue.InnerText = el.Value;
     }
 }

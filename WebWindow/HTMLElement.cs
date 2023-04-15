@@ -18,4 +18,10 @@ public abstract class HTMLElement<T> : Element<T>
         add => _clickEvent.AddHandler(value);
         remove=> _clickEvent.RemoveHandler(value);
     }
+
+    public string InnerText
+    {
+        get => Read<string>("innerText");
+        set => Write<string>("innerText", value);
+    }
 }
