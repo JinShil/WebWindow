@@ -10,12 +10,15 @@ public class Dom
     {
         nint _context = g_main_context_default();
         bool _done = false;
-        public string? ErrorMessage { get; private set;} = null;
+        public string? ErrorMessage { get; protected set;} = null;
 
-        public unsafe void Finish(nint webView, nint jResult, nint data)
+        protected virtual void Finish(nint jsResult)
+        { }
+
+        public unsafe void Finish(nint webView, nint result, nint data)
         {
             GError* err;
-            var jsResult = webkit_web_view_run_javascript_finish(webView, jResult, new nint(&err));
+            var jsResult = webkit_web_view_run_javascript_finish(webView, result, new nint(&err));
             if (jsResult == nint.Zero)
             {
                 ErrorMessage = Marshal.PtrToStringAuto(err->message);
@@ -23,6 +26,7 @@ public class Dom
             }
             else
             {
+                Finish(jsResult);
                 webkit_javascript_result_unref(jsResult);
             }
 
@@ -43,52 +47,24 @@ public class Dom
         }
     }
 
-    class Future<T>
+    class Future<T> : Future
     {
-        nint _context = g_main_context_default();
-        bool _done = false;
-        public string? ErrorMessage { get; private set;} = null;
         T? _result = default(T);
 
-        public unsafe void Finish(nint webView, nint jResult, nint data)
+        protected override void Finish(nint jsResult)
         {
-            GError* err;
-            var jsResult = webkit_web_view_run_javascript_finish(webView, jResult, new nint(&err));
-            if (jsResult == nint.Zero)
-            {
-                ErrorMessage = Marshal.PtrToStringAuto(err->message);
-                g_error_free(err);
-            }
-            else
-            {
-                var jsValue = webkit_javascript_result_get_js_value(jsResult);
+            base.Finish(jsResult);
+
+            var jsValue = webkit_javascript_result_get_js_value(jsResult);
                 
-                if (jsValue == nint.Zero)
-                {
-                    _result = default(T?);
-                }
-                else if (typeof(T) == typeof(string))
-                {
-                    var p = jsc_value_to_string(jsValue);
-                    _result = (T?)(object?)Marshal.PtrToStringAuto(p);
-                }
-
-                webkit_javascript_result_unref(jsResult);
-            }
-
-            _done = true;
-        }
-
-        public void Wait()
-        {
-            while(!_done)
+            if (jsValue == nint.Zero)
             {
-                g_main_context_iteration(_context, true);
+                _result = default(T?);
             }
-
-            if (ErrorMessage is not null)
+            else if (typeof(T) == typeof(string))
             {
-                throw new Exception(ErrorMessage);
+                var p = jsc_value_to_string(jsValue);
+                _result = (T?)(object?)Marshal.PtrToStringAuto(p);
             }
         }
 
