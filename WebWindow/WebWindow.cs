@@ -8,16 +8,16 @@ public class WebWindow
 
     public WebWindow(int width = 1024, int height = 768)
     {
-        _width = width;
-        _height = height;
+        _defaultWidth = width;
+        _defaultHeight = height;
 
         _app = gtk_application_new("WebWindow.Test", GApplicationFlags.G_APPLICATION_FLAGS_NONE);
         g_signal_connect(_app, "activate", FunctionPointer<ActivateHandler>(Activate), nint.Zero);
     }
 
     readonly nint _app;
-    readonly int _width;
-    readonly int _height;
+    readonly int _defaultWidth;
+    readonly int _defaultHeight;
     nint _window;
     nint _webView;
     nint _settings;
@@ -26,7 +26,7 @@ public class WebWindow
     {
         // Create the parent window
         _window = gtk_application_window_new(app);
-        gtk_window_set_default_size(_window, _width, _height);
+        gtk_window_set_default_size(_window, _defaultWidth, _defaultHeight);
         g_signal_connect(_window, "destroy", FunctionPointer<DestroyHandler>(CloseWindow), app);
 
         // Add the WebView

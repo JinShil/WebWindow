@@ -2,5 +2,5 @@
     "projectName": "WebWindow",
     "targetMachine": "192.168.0.10",
     "targetDir": "debug/",
-    "editor.fontSize": 12
+    "editor.fontSize": 14
 }

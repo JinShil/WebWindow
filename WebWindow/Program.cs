@@ -2,13 +2,13 @@
 
 static class Program
 {
-    static void Main()
+    static int Main()
     {
-        _webWindow = new WebWindow();
+        _webWindow = new WebWindow(800, 480);
         _webWindow.Activated += Activated;
         _webWindow.Loaded += Loaded;
 
-        _webWindow.Run();
+        return _webWindow.Run();
     }
 
     static WebWindow _webWindow = default!;
@@ -51,6 +51,7 @@ static class Program
 
             var closeButton = document.GetElementById<HTMLButtonElement>("close_button");
             closeButton.Click += CloseWindow;
+            
             // for(int i = 0; i < 100000; i++)
             // {
             //     p1.InnerHTML = i.ToString();
@@ -80,7 +81,6 @@ static class Program
         {
             _webWindow.EnterFullscreen();
         }
-        
     }
 
     static void OnClick(HTMLParagraphElement el, MouseEvent e)
