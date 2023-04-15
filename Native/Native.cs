@@ -83,6 +83,12 @@ public static class Gtk
         GTK_WINDOW_WINDOW_POPUP
     }
 
+    [Flags]
+    public enum GdkWindowState : int
+    {
+        GDK_WINDOW_STATE_FULLSCREEN = (1 << 4)
+    }
+
     [DllImport(FilePath)]
     public static extern void gtk_init(nint argc, nint argv);
 
@@ -105,10 +111,22 @@ public static class Gtk
     public static extern void gtk_widget_show_all(nint widget);
 
     [DllImport(FilePath)]
+    public static extern void gtk_window_fullscreen(nint window);
+
+    [DllImport(FilePath)]
+    public static extern void gtk_window_unfullscreen(nint window);
+
+    [DllImport(FilePath)]
     public static extern void gtk_main();
 
     [DllImport(FilePath)]
     public static extern void gtk_main_quit();
+
+    [DllImport(FilePath)]
+    public static extern nint gtk_widget_get_window(nint widget);
+
+    [DllImport(FilePath)]
+    public static extern GdkWindowState gdk_window_get_state(nint window);
 }
 
 public static class WebKit

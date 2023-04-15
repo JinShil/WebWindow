@@ -26,6 +26,10 @@ public class Document : Node<Document>
         var selector = $"{Selector}.getElementById(\"{id}\")";
         var tagName = Dom.Read<string>($"{selector}.tagName");
 
+        if (tagName == "BUTTON")
+        {
+            return (T)(object)new HTMLButtonElement(selector);
+        }
         if (tagName == "INPUT")
         {
             return (T)(object)new HTMLInputElement(selector);

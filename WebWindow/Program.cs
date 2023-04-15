@@ -18,19 +18,19 @@ static class Program
         return status;
     }
 
+    static nint _window;
+
     static void Activate(nint app, nint data)
     {
         // Create the parent window
-        var window = gtk_application_window_new(app);
-        gtk_window_set_default_size(window, 1024, 768);
-        g_signal_connect(window, "destroy", FunctionPointer<DestroyHandler>(CloseWindow), app);
+        _window = gtk_application_window_new(app);
+        gtk_window_set_default_size(_window, 1024, 768);
+        g_signal_connect(_window, "destroy", FunctionPointer<DestroyHandler>(CloseWindow), app);
 
         // Add the WebView
         var webView = webkit_web_view_new();
-        gtk_container_add(window, webView);
+        gtk_container_add(_window, webView);
         g_signal_connect(webView, "load-changed", FunctionPointer<LoadChangedHandler>(LoadChanged), webView);
-
-        gtk_widget_show_all(window);
 
         // Allow opening developer tools
         var settings = webkit_web_view_get_settings(webView);
@@ -45,9 +45,18 @@ static class Program
             <body>
                 <input id="range1" type="range" />
                 <p id="p1">paragraph</p>
+                <button id="fs_button">Toggle Fullscreen</button>
             </body>
         </html>
         """, null);
+
+        // Show the window on the screen
+        gtk_widget_show_all(_window);
+    }
+
+    static void CloseWindow(nint widget, nint app)
+    {
+        g_application_quit(app);
     }
 
     static void LoadChanged(nint webView, WebkitLoadEvent loadEvent, nint data)
@@ -58,26 +67,41 @@ static class Program
             {
                 Dom.Initialize(webView);
                 
-                Console.WriteLine(Dom.Document.Body.TagName);
-                
                 var range1 = Dom.Document.GetElementById<HTMLInputElement>("range1");
                 range1.Input += OnInput;
-
-                
 
                 var p1 = Dom.Document.GetElementById<HTMLParagraphElement>("p1");
                 p1.Click += OnClick;
 
-                for(int i = 0; i < 100000; i++)
-                {
-                    p1.InnerHTML = i.ToString();
-                }
+                var fsButton = Dom.Document.GetElementById<HTMLButtonElement>("fs_button");
+                fsButton.Click += ToggleFullscreen;
+
+                // for(int i = 0; i < 100000; i++)
+                // {
+                //     p1.InnerHTML = i.ToString();
+                // }
             }
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
+    }
+
+    static void ToggleFullscreen(HTMLButtonElement el, MouseEvent e)
+    {
+        var gdkWindow = gtk_widget_get_window(_window);
+        var state = gdk_window_get_state(gdkWindow);
+
+        if (state.HasFlag(GdkWindowState.GDK_WINDOW_STATE_FULLSCREEN))
+        {
+            gtk_window_unfullscreen(_window);
+        }
+        else
+        {
+            gtk_window_fullscreen(_window);
+        }
+        
     }
 
     static void OnClick(HTMLParagraphElement el, MouseEvent e)
@@ -88,10 +112,5 @@ static class Program
     static void OnInput(HTMLInputElement el, Event e)
     {
         WriteLine(el.Value);
-    }
-
-    static void CloseWindow(nint widget, nint app)
-    {
-        g_application_quit(app);
     }
 }
