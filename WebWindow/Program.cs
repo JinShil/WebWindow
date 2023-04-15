@@ -8,7 +8,7 @@ static class Program
 
     static int Main()
     {
-        var app = gtk_application_new("WebWindow.Test", ApplicationFlags.NONE);
+        var app = gtk_application_new("WebWindow.Test", GApplicationFlags.G_APPLICATION_FLAGS_NONE);
         g_signal_connect(app, "activate", FunctionPointer<ActivateHandler>(Activate), nint.Zero);
 
         var status = g_application_run(app, 0, nint.Zero);
