@@ -61,6 +61,7 @@ static class Program
     }
 
     static HTMLSpanElement rangeValue = default!;
+    static Document document = default!;
 
     static void LoadChanged(nint webView, WebkitLoadEvent loadEvent, nint data)
     {
@@ -68,25 +69,26 @@ static class Program
         {
             try
             {
-                Dom.Initialize(webView);
+                JSInterop.Initialize(webView);
+                document = new Document();
                 
-                var range1 = Dom.Document.GetElementById<HTMLInputElement>("range1");
+                var range1 = document.GetElementById<HTMLInputElement>("range1");
                 range1.Input += OnInput;
 
-                var p1 = Dom.Document.GetElementById<HTMLParagraphElement>("p1");
+                var p1 = document.GetElementById<HTMLParagraphElement>("p1");
                 p1.Click += OnClick;
 
-                var fsButton = Dom.Document.GetElementById<HTMLButtonElement>("fs_button");
+                var fsButton = document.GetElementById<HTMLButtonElement>("fs_button");
                 fsButton.Click += ToggleFullscreen;
 
-                var closeButton = Dom.Document.GetElementById<HTMLButtonElement>("close_button");
+                var closeButton = document.GetElementById<HTMLButtonElement>("close_button");
                 closeButton.Click += CloseWindow;
                 // for(int i = 0; i < 100000; i++)
                 // {
                 //     p1.InnerHTML = i.ToString();
                 // }
 
-                rangeValue = Dom.Document.GetElementById<HTMLSpanElement>("range_value");
+                rangeValue = document.GetElementById<HTMLSpanElement>("range_value");
                 rangeValue.InnerText = range1.Value;
             }
             catch(Exception ex)

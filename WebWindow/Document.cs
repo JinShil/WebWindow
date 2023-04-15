@@ -2,8 +2,8 @@ using WebWindow;
 
 public class Document : Node<Document>
 {
-    public Document(string selector)
-        : base(selector)
+    public Document()
+        : base("document")
     { }
 
     HTMLBodyElement? _body;
@@ -24,7 +24,7 @@ public class Document : Node<Document>
         where T : HTMLElement<T>
     {
         var selector = $"{Selector}.getElementById(\"{id}\")";
-        var tagName = Dom.Read<string>($"{selector}.tagName");
+        var tagName = JSInterop.Read<string>($"{selector}.tagName");
 
         if (tagName == "BODY")
         {

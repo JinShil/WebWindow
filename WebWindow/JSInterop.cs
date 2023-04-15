@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow;
 
-public class Dom
+internal static class JSInterop
 {
     delegate void FinishHandler(nint arg0, nint arg1, nint arg2);
 
@@ -221,23 +221,9 @@ public class Dom
         EmitAsync(js).Wait();
     }
 
-    static Document? _document;
-    public static Document Document
-    {
-        get
-        {
-            if (_document is null)
-            {
-                _document = new Document("document");
-            }
-
-            return _document;
-        }
-    }
-
     public static void Invoke(string method, params string[] args)
     {
-        Dom.Emit($"{method}({string.Join(',', args)});");
+        Emit($"{method}({string.Join(',', args)});");
     }
 
     public static void AddEventListener<T>(string selector, string evt, Action<T> action, bool useCapture = false)

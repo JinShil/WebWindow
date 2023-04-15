@@ -48,13 +48,13 @@ public abstract class EventTarget<T>
     void AddEventListener<TEvent>(string evt, Action<TEvent> action, bool useCapture = false)
         where TEvent : Event
     {
-        Dom.AddEventListener(Selector, evt, action, useCapture);
+        JSInterop.AddEventListener(Selector, evt, action, useCapture);
     }
 
     void RemoveEventListener<TEvent>(string evt, Action<TEvent> action, bool useCapture = false)
         where TEvent : Event
     {
-        Dom.RemoveEventListener(Selector, evt, action, useCapture);
+        JSInterop.RemoveEventListener(Selector, evt, action, useCapture);
     }
 
     protected EventTarget(string selector)
@@ -66,7 +66,7 @@ public abstract class EventTarget<T>
 
     protected TValue Read<TValue>(string js)
     {
-        return Dom.Read<TValue>($"{Selector}.{js}");
+        return JSInterop.Read<TValue>($"{Selector}.{js}");
     }
 
     protected void Write<TValue>(string property, TValue value)
@@ -76,11 +76,12 @@ public abstract class EventTarget<T>
         {
             sValue = $"\"{sValue}\"";
         }
-        Dom.Write($"{Selector}.{property}={sValue};");
+        
+        JSInterop.Write($"{Selector}.{property}={sValue};");
     }
 
     protected void Invoke(string method, params string[] args)
     {
-        Dom.Invoke(method, args);
+        JSInterop.Invoke(method, args);
     }
 }
