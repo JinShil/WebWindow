@@ -157,7 +157,8 @@ public class Dom
             var s = Marshal.PtrToStringAuto(p);
             if (s is not null)
             {
-                var e = JsonSerializer.Deserialize<Event>(s, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var op = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var e = JsonSerializer.Deserialize<Event>(s, op);
                 if (e is null)
                 {
                     Error.WriteLine($"Could not deserialize event.");
@@ -175,8 +176,13 @@ public class Dom
                         {
                             if (handler is Action<MouseEvent>)
                             {
-                                var me = JsonSerializer.Deserialize<MouseEvent>(s, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                var me = JsonSerializer.Deserialize<MouseEvent>(s, op);
                                 ((Action<MouseEvent>)handler)(me!);
+                            }
+                            else if (handler is Action<UIEvent>)
+                            {
+                                var ue = JsonSerializer.Deserialize<UIEvent>(s, op);
+                                ((Action<UIEvent>)handler)(ue!);
                             }
                             else if (handler is Action<Event>)
                             {

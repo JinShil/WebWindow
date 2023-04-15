@@ -6,6 +6,8 @@ public static class Gio
 {
     public const string FilePath = "libgio-2.0.so.0";
 
+    const int G_PRIORITY_DEFAULT_IDLE = 200;
+
     public enum ApplicationFlags
     {
         NONE = 0
@@ -28,6 +30,15 @@ public static class Gio
 
     [DllImport(FilePath)]
     public static extern void g_free(nint o);
+
+    [DllImport(FilePath)]
+    public static extern uint g_idle_add_full(int priority, nint function, nint data, nint notify);
+
+    [DllImport(FilePath)]
+    public static extern uint g_idle_add(nint function, nint data);
+
+    [DllImport(FilePath)]
+    public static extern void g_application_quit(nint application);
 }
 
 public static class GObject
@@ -79,6 +90,9 @@ public static class Gtk
     public static extern nint gtk_application_new (string application_id, Gio.ApplicationFlags flags);
 
     [DllImport(FilePath)]
+    public static extern nint gtk_application_window_new(nint app);
+
+    [DllImport(FilePath)]
     public static extern nint gtk_window_new(GtkWindowType type);
 
     [DllImport(FilePath)]
@@ -89,6 +103,12 @@ public static class Gtk
 
     [DllImport(FilePath)]
     public static extern void gtk_widget_show_all(nint widget);
+
+    [DllImport(FilePath)]
+    public static extern void gtk_main();
+
+    [DllImport(FilePath)]
+    public static extern void gtk_main_quit();
 }
 
 public static class WebKit

@@ -8,35 +8,24 @@ static class Program
     delegate void void_nint_nint_nint(nint arg0, nint arg1, nint arg2);
     delegate void void_nint_int_nint(nint arg0, int arg1, nint arg2);
 
-    static bool running = true;
-
     static int Main()
     {
-        Console.WriteLine(Environment.CurrentDirectory);
-        var app = gtk_application_new("BlazorWebKit.Test", ApplicationFlags.NONE);
-
+        var app = gtk_application_new("WebWindow.Test", ApplicationFlags.NONE);
         g_signal_connect(app, "activate", Marshal.GetFunctionPointerForDelegate<void_nint_nint>(OnActivate), nint.Zero);
 
-        // Application.Run();
         var status = g_application_run(app, 0, nint.Zero);
-        var context = g_main_context_default();
-
-        while(running)
-        {
-             g_main_context_iteration(context, true);
-        }
 
         g_object_unref(app);
 
         return status;
     }
 
-    static void OnActivate(nint instance, nint data)
+    static void OnActivate(nint app, nint data)
     {
         // Create the parent window
-        var window = gtk_window_new(GtkWindowType.GTK_WINDOW_TOPLEVEL);
+        var window = gtk_application_window_new(app);
         gtk_window_set_default_size(window, 1024, 768);
-        g_signal_connect(window, "destroy", Marshal.GetFunctionPointerForDelegate<void_nint_nint>(CloseWindow), nint.Zero);
+        g_signal_connect(window, "destroy", Marshal.GetFunctionPointerForDelegate<void_nint_nint>(CloseWindow), app);
 
         // Add the WebView
         var webView = webkit_web_view_new();
@@ -95,8 +84,8 @@ static class Program
         WriteLine(el.Value);
     }
 
-    static void CloseWindow(nint instance, nint data)
+    static void CloseWindow(nint widget, nint app)
     {
-        running = false;
+        g_application_quit(app);
     }
 }
