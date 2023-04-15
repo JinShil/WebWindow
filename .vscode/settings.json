@@ -1,5 +1,5 @@
 {
-    "projectName": "WebWindow",
+    "projectName": "WebWindow.Test",
     "targetMachine": "192.168.0.10",
     "targetDir": "debug/",
     "editor.fontSize": 14

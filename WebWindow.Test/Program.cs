@@ -1,6 +1,9 @@
-﻿using System.Reflection;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using static System.Console;
 
-namespace WebWindow;
+namespace WebWindow.Test;
 
 static class Program
 {
@@ -19,17 +22,27 @@ static class Program
 
     static void Activated(WebWindow webWindow)
     {
-        var asm = Assembly.GetEntryAssembly()!;
-        var stream = asm.GetManifestResourceStream("WebWindow.index.html")!;
-        using (var sr = new StreamReader(stream))
+        // Load the initial HTML content
+        var asm = Assembly.GetExecutingAssembly();
+        string resourceName = $"{asm.GetName().Name}.index.html";
+        var stream = asm.GetManifestResourceStream(resourceName);
+        if (stream is null)
         {
-            _webWindow.LoadHTML(sr.ReadToEnd());
+            // throw new Exception($"Could not locate embedded resource \"{resourceName}\"");
+            Error.WriteLine($"Could not locate embedded resource \"{resourceName}\"");
         }
-        
+        else
+        {
+            using (var sr = new StreamReader(stream))
+            {
+                _webWindow.LoadHTML(sr.ReadToEnd());
+            }
+        }
     }
 
     static void Loaded(WebWindow webWindow)
     {
+        // The content has been loaded. Wire things up
         try
         {
             document = new Document();
