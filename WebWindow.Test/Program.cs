@@ -9,7 +9,7 @@ static class Program
 {
     static int Main()
     {
-        _webWindow = new WebWindow(800, 480);
+        _webWindow = new WebWindow(1024, 480);
         _webWindow.Activated += Activated;
         _webWindow.Loaded += Loaded;
 
