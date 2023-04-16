@@ -24,4 +24,4 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore WebWindow/WebWindow.csproj
     - name: Publish
-      run: dotnet nuget push **/*.nupkg -s JinShil --skip-duplicate
+      run: dotnet nuget push WebWindow/**/*.nupkg -s JinShil --skip-duplicate
