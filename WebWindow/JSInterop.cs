@@ -117,7 +117,7 @@ internal static class JSInterop
     static nint _context;
     static nint _webView;
 
-    static Dictionary<string, object> Handlers = new();
+    static Dictionary<int, object> Handlers = new();
 
     static void HandleWebMessage(nint contentManager, nint jsResult, nint webView)
     {
@@ -129,42 +129,29 @@ internal static class JSInterop
             var s = Marshal.PtrToStringAuto(p);
             if (s is not null)
             {
-                var op = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var e = JsonSerializer.Deserialize<Event>(s, op);
-                if (e is null)
+                var e = Event.Deserialize(s);
+
+                if (!Handlers.TryGetValue(e.DotNetMethod, out object? handler))
                 {
-                    Error.WriteLine($"Could not deserialize event.");
+                    Error.WriteLine($"Handler \"{e.DotNetMethod}\" was not registered.");
                 }
                 else
                 {
-                    var m = e.DotNetMethod;
-                    if (m is not null)
+                    if (handler is Action<MouseEvent> hme && e is MouseEvent me)
                     {
-                        if (!Handlers.TryGetValue(m, out object? handler))
-                        {
-                            Error.WriteLine($"Handler \"{m}\" was not registered.");
-                        }
-                        else
-                        {
-                            if (handler is Action<MouseEvent>)
-                            {
-                                var me = JsonSerializer.Deserialize<MouseEvent>(s, op);
-                                ((Action<MouseEvent>)handler)(me!);
-                            }
-                            else if (handler is Action<UIEvent>)
-                            {
-                                var ue = JsonSerializer.Deserialize<UIEvent>(s, op);
-                                ((Action<UIEvent>)handler)(ue!);
-                            }
-                            else if (handler is Action<Event>)
-                            {
-                                ((Action<Event>)handler)(e);
-                            }
-                            else
-                            {
-                                Error.WriteLine("Event was not implemented");
-                            }
-                        }
+                        hme(me);
+                    }
+                    else if (handler is Action<UIEvent> huie && e is UIEvent uie)
+                    {
+                        huie(uie);
+                    }
+                    else if (handler is Action<Event> he)
+                    {
+                        he(e);
+                    }
+                    else
+                    {
+                        Error.WriteLine("Event was not implemented");
                     }
                 }
             }
@@ -224,10 +211,9 @@ internal static class JSInterop
         Emit($"{method}({string.Join(',', args)});");
     }
 
-    public static void AddEventListener<T>(string selector, string evt, Action<T> action, bool useCapture = false)
+    public static void AddEventListener<T>(string selector, string evt, Action<T> action, int id, bool useCapture = false)
         where T : Event
     {
-        var id = action.GetHashCode().ToString();
         var name = $"_{id}";
 
         if (Handlers.TryAdd(id, action))
@@ -235,7 +221,7 @@ internal static class JSInterop
             Emit($$"""
                 function {{name}}(e) 
                 {
-                    e.{{nameof(Event.DotNetMethod)}} = "{{id}}";
+                    e.{{nameof(Event.DotNetMethod)}} = {{id}};
                     window.webkit.messageHandlers.webview.postMessage(stringifyEvent(e)); 
                 }
                 """);
@@ -245,11 +231,10 @@ internal static class JSInterop
         Invoke($"{selector}.addEventListener", $"\"{evt}\"", name, "{ passive: true }", useCapture.ToString().ToLower());
     }
 
-    public static void RemoveEventListener<T>(string selector, string evt, Action<T> action, bool useCapture = false)
+    public static void RemoveEventListener<T>(string selector, string evt, int id, bool useCapture = false)
         where T : Event
     {
-        var id = action.GetHashCode().ToString();
-        
+       
         var name = $"_{id}";
         Invoke($"{selector}.removeEventListener", $"\"{evt}\"", name, useCapture.ToString().ToLower());
     }

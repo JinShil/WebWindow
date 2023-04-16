@@ -35,8 +35,6 @@ public class WebWindow
         g_signal_connect(_webView, "load-changed", FunctionPointer<LoadChangedHandler>(LoadChanged), _webView);
         _settings = webkit_web_view_get_settings(_webView);
 
-        JSInterop.Initialize(_webView);
-
         // Show the window on the screen
         gtk_widget_show_all(_window);
 

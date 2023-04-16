@@ -1,6 +1,15 @@
 
 namespace WebWindow;
 
+static internal class IdFactory
+{
+    static int _lastId = 0;
+    public static int GetId()
+    {
+        return ++_lastId;
+    }
+}
+
 public abstract class EventTarget<T>
     where T : EventTarget<T>
 {
@@ -14,6 +23,7 @@ public abstract class EventTarget<T>
             _handlers = new();
         }
 
+        readonly int _handlerId = IdFactory.GetId();
         readonly string _event;
         readonly T _element;
         readonly List<Action<T, TEvent>> _handlers;
@@ -31,7 +41,7 @@ public abstract class EventTarget<T>
             _handlers.Add(handler);
             if (_handlers.Count == 1)
             {
-                JSInterop.AddEventListener<TEvent>(_element.Selector, _event, CallHandlers);
+                JSInterop.AddEventListener<TEvent>(_element.Selector, _event, CallHandlers, _handlerId);
             }
         }
 
@@ -39,7 +49,7 @@ public abstract class EventTarget<T>
         {
             if (_handlers.Count == 1)
             {
-                JSInterop.RemoveEventListener<TEvent>(_element.Selector, _event, CallHandlers);
+                JSInterop.RemoveEventListener<TEvent>(_element.Selector, _event, _handlerId);
             }
             _handlers.Remove(handler);
         }
