@@ -9,7 +9,7 @@ static class Program
 {
     static int Main()
     {
-        _webWindow = new WebWindow(1024, 480);
+        _webWindow = new WebWindow(800, 480);
         _webWindow.Activated += Activated;
         _webWindow.Loaded += Loaded;
 
@@ -24,7 +24,15 @@ static class Program
     {
         try
         {
+            // Debug builds should show a context menu, and...
+            #if !DEBUG
+            _webWindow.ContextMenu += (ww) => true;
+            #endif
+
+            // ... debug builds should also show the developer tools in the context menu
+            #if DEBUG
             _webWindow.DeveloperExtrasAreEnabled = true;
+            #endif
 
             // Load the initial HTML content
             var asm = Assembly.GetExecutingAssembly();
@@ -32,8 +40,7 @@ static class Program
             var stream = asm.GetManifestResourceStream(resourceName);
             if (stream is null)
             {
-                // throw new Exception($"Could not locate embedded resource \"{resourceName}\"");
-                Error.WriteLine($"Could not locate embedded resource \"{resourceName}\"");
+                throw new Exception($"Could not locate embedded resource \"{resourceName}\"");
             }
             else
             {

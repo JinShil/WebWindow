@@ -5,6 +5,7 @@ public class WebWindow
     delegate void DestroyHandler(nint widget, nint data);
     delegate void ActivateHandler(nint app, nint data);
     delegate void LoadChangedHandler(nint arg0, WebkitLoadEvent arg1, nint data);
+    delegate bool ContextMenuHandler(nint webView, nint contextMenu, nint evt, nint hitTestResult, nint data);
 
     public WebWindow(int width = 1024, int height = 768)
     {
@@ -32,6 +33,7 @@ public class WebWindow
         // Add the WebView
         _webView = webkit_web_view_new();
         gtk_container_add(_window, _webView);
+        g_signal_connect(_webView, "context-menu", FunctionPointer<ContextMenuHandler>(OnContextMenu), _webView);
         g_signal_connect(_webView, "load-changed", FunctionPointer<LoadChangedHandler>(LoadChanged), _webView);
         _settings = webkit_web_view_get_settings(_webView);
 
@@ -56,10 +58,21 @@ public class WebWindow
         }
     }
 
-    public Action<WebWindow>? Activated;
-    public Action<WebWindow>? Loaded;
-    public Action<WebWindow>? Closing;
-    public Action<WebWindow>? Closed;
+    bool OnContextMenu(nint webView, nint contextMenu, nint evt, nint hitTestResult, nint data)
+    {
+        if (ContextMenu is null)
+        {
+            return false;
+        }
+
+        return ContextMenu.Invoke(this);
+    }
+
+    public event Action<WebWindow>? Activated;
+    public event Action<WebWindow>? Loaded;
+    public event Action<WebWindow>? Closing;
+    public event Action<WebWindow>? Closed;
+    public event Func<WebWindow, bool>? ContextMenu;
 
     public void LoadHTML(string html)
     {
