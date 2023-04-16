@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-test-and-publish:
+  build-and-publish:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -20,9 +20,8 @@ jobs:
     - name: Add dotnet source
       run: dotnet nuget add source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json --name dotnet7
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore WebWindow/WebWindow.csproj
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore WebWindow/WebWindow.csproj
     - name: Publish
       run: dotnet nuget push **/*.nupkg -s JinShil --skip-duplicate
-      
