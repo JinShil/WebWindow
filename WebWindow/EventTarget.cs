@@ -55,34 +55,6 @@ public abstract class EventTarget<T>
         }
     }
 
-    protected class Property<TValue>
-    {
-        public Property(T element, string propertyName)
-        {
-            _element = element;
-            _propertyName = propertyName;
-        }
-
-        readonly T _element;
-        readonly string _propertyName;
-        public TValue Value
-        {
-            get => JSInterop.Read<TValue>($"{_element.Selector}.{_propertyName}");
-            set
-            {
-                var sValue = value is null ? "null" : value.ToString();
-
-                // Wrap value in double quotes if of type string
-                if (value is not null && typeof(TValue) == typeof(string))
-                {
-                    sValue = $"\"{sValue}\"";
-                }
-                
-                JSInterop.Write($"{_element.Selector}.{_propertyName}={sValue};");
-            }
-        }
-    }
-
     protected EventTarget(string selector)
     {
         Selector = selector;

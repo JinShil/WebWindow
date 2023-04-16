@@ -6,9 +6,9 @@ public abstract class Element<T> : Node<T>
     protected Element(string selector)
         : base(selector)
     { 
-        _tagName = new((T)this, "tagName");
-        _id = new((T)this, "id");
-        _innerHTML = new((T)this, "innerHTML");
+        _tagName = new(Selector, "tagName");
+        _id = new(Selector, "id");
+        _innerHTML = new(Selector, "innerHTML");
     }
 
     readonly Property<string> _tagName;

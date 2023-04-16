@@ -83,6 +83,14 @@ static class Program
             // }
             // p1.InnerHTML = sw.ElapsedMilliseconds.ToString();
 
+            var r = document.GetElementById<HTMLDivElement>("r");
+            var g = document.GetElementById<HTMLDivElement>("g");
+            var b = document.GetElementById<HTMLDivElement>("b");
+            var rand = new Random();
+            r.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
+            g.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
+            b.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
+
             rangeValue = document.GetElementById<HTMLSpanElement>("range_value");
             rangeValue.InnerText = range1.Value;
         }

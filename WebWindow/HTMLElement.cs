@@ -9,7 +9,9 @@ public abstract class HTMLElement<T> : Element<T>
         : base(selector)
     { 
         _clickEvent = new((T)this, "click");
-        _innerText = new((T)this, "innerText");
+        _innerText = new(Selector, "innerText");
+        
+        Style = new CSSStyleDeclaration(Selector);
     }    
 
     readonly EventHolder<MouseEvent> _clickEvent;
@@ -26,4 +28,6 @@ public abstract class HTMLElement<T> : Element<T>
         get => _innerText.Value;
         set => _innerText.Value = value;
     }
+
+    public CSSStyleDeclaration Style { get; init; }
 }

@@ -7,8 +7,8 @@ public class HTMLInputElement : HTMLElement<HTMLInputElement>
         : base(selector)
     { 
         _inputEventHolder = new(this, "input");
-        _type = new(this, "type");
-        _value = new(this, "value");
+        _type = new(Selector, "type");
+        _value = new(Selector, "value");
     }    
 
     readonly Property<string> _type;

@@ -34,6 +34,10 @@ public class Document : Node<Document>
         {
             return (T)(object)new HTMLButtonElement(selector);
         }
+        else if (tagName == "DIV")
+        {
+            return (T)(object)new HTMLDivElement(selector);
+        }
         if (tagName == "INPUT")
         {
             return (T)(object)new HTMLInputElement(selector);
