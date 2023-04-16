@@ -68,10 +68,13 @@ static class Program
             var closeButton = document.GetElementById<HTMLButtonElement>("close_button");
             closeButton.Click += CloseWindow;
             
+            // System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            // sw.Start();
             // for(int i = 0; i < 100000; i++)
             // {
             //     p1.InnerHTML = i.ToString();
             // }
+            // p1.InnerHTML = sw.ElapsedMilliseconds.ToString();
 
             rangeValue = document.GetElementById<HTMLSpanElement>("range_value");
             rangeValue.InnerText = range1.Value;
