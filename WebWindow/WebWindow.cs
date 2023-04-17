@@ -65,7 +65,14 @@ public class WebWindow
     readonly DeleteHandler _deleteHandler;
     bool Delete(nint widget, nint evt, nint data)
     {
-        Close();
+        if (!_closing)
+        {
+            Close();
+            return true;
+        }
+
+        Closed?.Invoke(this);
+        g_application_quit(_app);
 
         return true;
     }
@@ -95,6 +102,7 @@ public class WebWindow
     public event Action<WebWindow>? Activated;
     public event Action<WebWindow>? Loaded;
     public event Action<WebWindow>? Closing;
+    public event Action<WebWindow>? Closed;
     public event Func<WebWindow, bool>? ContextMenu;
 
     public void LoadHTML(string html)
@@ -110,11 +118,13 @@ public class WebWindow
         return status;
     }
 
+    bool _closing = false;
     public void Close()
     {
+        _closing = true;
         Closing?.Invoke(this);
 
-        g_application_quit(_app);
+        gtk_window_close(_window);
     }
 
     public bool IsFullscreen

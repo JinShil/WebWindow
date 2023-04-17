@@ -90,7 +90,6 @@ static class Program
                     r.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
                     g.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
                     b.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
-                    // _webWindow.DoEvents();
                     _webWindow.InvokeAsync(updateColors);
                 }
                 catch(Exception ex)
@@ -103,7 +102,6 @@ static class Program
             update = () =>
             {
                 p1.InnerText = $"Run Time:  {(DateTime.Now - Process.GetCurrentProcess().StartTime)}";
-                // _webWindow.DoEvents();
                 _webWindow.InvokeAsync(update);
             };
 
