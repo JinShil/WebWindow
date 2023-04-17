@@ -6,40 +6,26 @@ namespace WebWindow;
 
 public class WebWindow
 {
-    delegate void DestroyHandler(nint widget, nint data);
+    delegate bool DeleteHandler(nint widget, nint evt, nint data);
     delegate void ActivateHandler(nint app, nint data);
     delegate void LoadChangedHandler(nint arg0, WebkitLoadEvent arg1, nint data);
     delegate bool ContextMenuHandler(nint webView, nint contextMenu, nint evt, nint hitTestResult, nint data);
-    public delegate bool TimeoutHandler(nint data);
+    delegate bool TimeoutHandler(nint data);
 
     // Had to do this to prevent handlers from being garbage collected before
     // being called.
-    static ConcurrentDictionary<nint, WebWindow> _nativeToManaged = new();
-    static ConcurrentDictionary<nint, Action> _timeoutHandler = new();
-    static void Destroy(nint window, nint data)
-    {
-        if (_nativeToManaged.Remove(window, out WebWindow? ww))
-        {
-            if (!ww._closed)
-            {
-                ww.Close();
-            }
-
-            g_application_quit(ww._app);
-        }
-    }
-
-    static bool Timeout(nint window)
-    {
-        if (_timeoutHandler.Remove(window, out Action? handler))
-        {
-            handler();
-        }
-        return false;
-    }
+    static ConcurrentBag<WebWindow> _windows = new();
 
     public WebWindow(int width = 1024, int height = 768)
     {
+        _deleteHandler = new(Delete);
+        _timeoutHandler = new (Timeout);
+        _loadChangedHandler = new(LoadChanged);
+        _onContextMenuHandler = new(OnContextMenu);
+        _activateHandler = new(Activate);
+
+        _windows.Add(this);
+
         _defaultWidth = width;
         _defaultHeight = height;
 
@@ -54,20 +40,20 @@ public class WebWindow
     nint _webView;
     nint _settings;
 
+    readonly ActivateHandler _activateHandler;
     void Activate(nint app, nint data)
     {
         // Create the parent window
         _window = gtk_application_window_new(app);
         gtk_window_set_default_size(_window, _defaultWidth, _defaultHeight);
         
-        _nativeToManaged.GetOrAdd(_window, this);
-        g_signal_connect(_window, "destroy", FunctionPointer<DestroyHandler>(Destroy), nint.Zero);
+        g_signal_connect(_window, "delete-event", FunctionPointer<DeleteHandler>(_deleteHandler), nint.Zero);
 
         // Add the WebView
         _webView = webkit_web_view_new();
         gtk_container_add(_window, _webView);
-        g_signal_connect(_webView, "context-menu", FunctionPointer<ContextMenuHandler>(OnContextMenu), _webView);
-        g_signal_connect(_webView, "load-changed", FunctionPointer<LoadChangedHandler>(LoadChanged), _webView);
+        g_signal_connect(_webView, "context-menu", FunctionPointer<ContextMenuHandler>(_onContextMenuHandler), _webView);
+        g_signal_connect(_webView, "load-changed", FunctionPointer<LoadChangedHandler>(_loadChangedHandler), _webView);
         _settings = webkit_web_view_get_settings(_webView);
 
         // Show the window on the screen
@@ -76,8 +62,15 @@ public class WebWindow
         Activated?.Invoke(this);
     }
 
-    bool _closed;
+    readonly DeleteHandler _deleteHandler;
+    bool Delete(nint widget, nint evt, nint data)
+    {
+        Close();
 
+        return true;
+    }
+
+    readonly LoadChangedHandler _loadChangedHandler;
     void LoadChanged(nint webView, WebkitLoadEvent loadEvent, nint data)
     {
         if (loadEvent == WebkitLoadEvent.WEBKIT_LOAD_FINISHED)
@@ -88,6 +81,7 @@ public class WebWindow
         }
     }
 
+    readonly ContextMenuHandler _onContextMenuHandler;
     bool OnContextMenu(nint webView, nint contextMenu, nint evt, nint hitTestResult, nint data)
     {
         if (ContextMenu is null)
@@ -101,7 +95,6 @@ public class WebWindow
     public event Action<WebWindow>? Activated;
     public event Action<WebWindow>? Loaded;
     public event Action<WebWindow>? Closing;
-    public event Action<WebWindow>? Closed;
     public event Func<WebWindow, bool>? ContextMenu;
 
     public void LoadHTML(string html)
@@ -121,10 +114,7 @@ public class WebWindow
     {
         Closing?.Invoke(this);
 
-        gtk_window_close(_window);
-
-        _closed = true;
-        Closed?.Invoke(this);        
+        g_application_quit(_app);
     }
 
     public bool IsFullscreen
@@ -160,17 +150,24 @@ public class WebWindow
         set=> webkit_settings_set_enable_developer_extras(_settings, true);
     }
 
-    public void InvokeAsync(Action f)
+    bool Timeout(nint data)
     {
-        _timeoutHandler.GetOrAdd(_window, f);
-        g_timeout_add(0, FunctionPointer<TimeoutHandler>(Timeout), _window);
+        var h = _timeoutHandlers;
+        _timeoutHandlers = new();
+
+        foreach(var a in h)
+        {
+            a();
+        }
+
+        return false;
     }
 
-    public void DoEvents()
+    readonly TimeoutHandler _timeoutHandler;
+    List<Action> _timeoutHandlers = new();
+    public void InvokeAsync(Action f)
     {
-        while(gtk_events_pending())
-        {
-            gtk_main_iteration(); 
-        }
+        _timeoutHandlers.Add(f);
+        g_timeout_add(0, FunctionPointer<TimeoutHandler>(_timeoutHandler), nint.Zero);
     }
 }

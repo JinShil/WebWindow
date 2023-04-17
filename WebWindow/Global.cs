@@ -3,6 +3,7 @@ global using static System.Console;
 global using System.Diagnostics;
 global using System.Text.Json;
 global using System.Collections.Generic;
+global using System.Linq;
 global using static WebWindow.Native.Gio;
 global using static WebWindow.Native.GObject;
 global using static WebWindow.Native.Gtk;

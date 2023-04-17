@@ -8,19 +8,30 @@ internal static class JSInterop
 
     class Future
     {
+        public Future()
+        {
+            FinishHandler = new(Finish);
+        }
+
         bool _done = false;
         public string? ErrorMessage { get; protected set;} = null;
+
+        public FinishHandler FinishHandler { get; init; }
 
         protected virtual void Finish(nint jsResult)
         { }
 
-        public unsafe void Finish(nint webView, nint result, nint data)
+        unsafe void Finish(nint webView, nint result, nint data)
         {
             GError* err;
             var jsResult = webkit_web_view_run_javascript_finish(webView, result, new nint(&err));
             if (jsResult == nint.Zero)
             {
                 ErrorMessage = Marshal.PtrToStringAuto(err->message);
+                if (string.IsNullOrEmpty(ErrorMessage))
+                {
+                    ErrorMessage = $"Error code: {err->code}";
+                }
                 g_error_free(err);
             }
             else
@@ -184,21 +195,21 @@ internal static class JSInterop
     static Future<T> ReadAsync<T>(string js)
     {
         var f = new Future<T>();
-        webkit_web_view_run_javascript(_webView, js, nint.Zero, FunctionPointer<FinishHandler>(f.Finish), nint.Zero);
+        webkit_web_view_run_javascript(_webView, js, nint.Zero, FunctionPointer<FinishHandler>(f.FinishHandler), nint.Zero);
         return f;
     }
 
     static Future WriteAsync(string js)
     {
         var f = new Future();
-        webkit_web_view_run_javascript(_webView, js, nint.Zero, FunctionPointer<FinishHandler>(f.Finish), nint.Zero);
+        webkit_web_view_run_javascript(_webView, js, nint.Zero, FunctionPointer<FinishHandler>(f.FinishHandler), nint.Zero);
         return f;
     }
 
     static Future EmitAsync(string js)
     {
         var f = new Future();
-        webkit_web_view_run_javascript(_webView, js, nint.Zero, FunctionPointer<FinishHandler>(f.Finish), nint.Zero);
+        webkit_web_view_run_javascript(_webView, js, nint.Zero, FunctionPointer<FinishHandler>(f.FinishHandler), nint.Zero);
         return f;
     }
 

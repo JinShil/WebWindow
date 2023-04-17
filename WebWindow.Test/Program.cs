@@ -81,20 +81,38 @@ static class Program
             var g = document.GetElementById<HTMLDivElement>("g");
             var b = document.GetElementById<HTMLDivElement>("b");
             var rand = new Random();
-            r.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
-            g.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
-            b.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
 
-            rangeValue = document.GetElementById<HTMLSpanElement>("range_value");
-            rangeValue.InnerText = range1.Value;
+            var updateColors = () => {};
+            updateColors = () =>
+            {
+                try
+                {
+                    r.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
+                    g.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
+                    b.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
+                    // _webWindow.DoEvents();
+                    _webWindow.InvokeAsync(updateColors);
+                }
+                catch(Exception ex)
+                {
+                    Error.WriteLine(ex.Message);
+                }
+            };
 
-            var update = new Action(() => {});
+            var update = () => {};
             update = () =>
             {
                 p1.InnerText = $"Run Time:  {(DateTime.Now - Process.GetCurrentProcess().StartTime)}";
+                // _webWindow.DoEvents();
                 _webWindow.InvokeAsync(update);
             };
+
+            _webWindow.InvokeAsync(updateColors);
             _webWindow.InvokeAsync(update);
+            
+
+            rangeValue = document.GetElementById<HTMLSpanElement>("range_value");
+            rangeValue.InnerText = range1.Value;            
         }
         catch(Exception ex)
         {
@@ -104,7 +122,7 @@ static class Program
 
     static void Closing(WebWindow window)
     {
-        
+
     }
 
     static void CloseWindow(HTMLButtonElement el, MouseEvent e)

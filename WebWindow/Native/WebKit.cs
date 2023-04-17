@@ -128,4 +128,7 @@ internal static class WebKit
 
     [DllImport(FilePath)]
     public static extern void webkit_web_view_terminate_web_process(nint web_view);
+
+    [DllImport(FilePath)]
+    public static extern void webkit_web_view_try_close (nint web_view);
 }
