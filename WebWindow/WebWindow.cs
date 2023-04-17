@@ -1,3 +1,7 @@
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Collections.Concurrent;
+
 namespace WebWindow;
 
 public class WebWindow
@@ -6,6 +10,33 @@ public class WebWindow
     delegate void ActivateHandler(nint app, nint data);
     delegate void LoadChangedHandler(nint arg0, WebkitLoadEvent arg1, nint data);
     delegate bool ContextMenuHandler(nint webView, nint contextMenu, nint evt, nint hitTestResult, nint data);
+    public delegate bool TimeoutHandler(nint data);
+
+    // Had to do this to prevent handlers from being garbage collected before
+    // being called.
+    static ConcurrentDictionary<nint, WebWindow> _nativeToManaged = new();
+    static ConcurrentDictionary<nint, Action> _timeoutHandler = new();
+    static void Destroy(nint window, nint data)
+    {
+        if (_nativeToManaged.Remove(window, out WebWindow? ww))
+        {
+            if (!ww._closed)
+            {
+                ww.Close();
+            }
+
+            g_application_quit(ww._app);
+        }
+    }
+
+    static bool Timeout(nint window)
+    {
+        if (_timeoutHandler.Remove(window, out Action? handler))
+        {
+            handler();
+        }
+        return false;
+    }
 
     public WebWindow(int width = 1024, int height = 768)
     {
@@ -28,7 +59,9 @@ public class WebWindow
         // Create the parent window
         _window = gtk_application_window_new(app);
         gtk_window_set_default_size(_window, _defaultWidth, _defaultHeight);
-        g_signal_connect(_window, "destroy", FunctionPointer<DestroyHandler>(CloseWindow), app);
+        
+        _nativeToManaged.GetOrAdd(_window, this);
+        g_signal_connect(_window, "destroy", FunctionPointer<DestroyHandler>(Destroy), nint.Zero);
 
         // Add the WebView
         _webView = webkit_web_view_new();
@@ -43,10 +76,7 @@ public class WebWindow
         Activated?.Invoke(this);
     }
 
-    void CloseWindow(nint widget, nint app)
-    {
-        Close();
-    }
+    bool _closed;
 
     void LoadChanged(nint webView, WebkitLoadEvent loadEvent, nint data)
     {
@@ -90,8 +120,11 @@ public class WebWindow
     public void Close()
     {
         Closing?.Invoke(this);
+
         gtk_window_close(_window);
-        Closed?.Invoke(this);
+
+        _closed = true;
+        Closed?.Invoke(this);        
     }
 
     public bool IsFullscreen
@@ -125,5 +158,19 @@ public class WebWindow
     {
         get => webkit_settings_get_enable_developer_extras(_settings);
         set=> webkit_settings_set_enable_developer_extras(_settings, true);
+    }
+
+    public void InvokeAsync(Action f)
+    {
+        _timeoutHandler.GetOrAdd(_window, f);
+        g_timeout_add(0, FunctionPointer<TimeoutHandler>(Timeout), _window);
+    }
+
+    public void DoEvents()
+    {
+        while(gtk_events_pending())
+        {
+            gtk_main_iteration();
+        }
     }
 }

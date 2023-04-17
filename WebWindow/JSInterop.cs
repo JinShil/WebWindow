@@ -36,7 +36,7 @@ internal static class JSInterop
         {
             while(!_done)
             {
-                g_main_context_iteration(_context, true);
+                gtk_main_iteration();
             }
 
             if (ErrorMessage is not null)
@@ -81,7 +81,6 @@ internal static class JSInterop
     public static void Initialize(nint webView)
     {
         _webView = webView;
-        _context = g_main_context_default();
 
         var webViewContentManager = webkit_web_view_get_user_content_manager(webView);
         webkit_user_content_manager_register_script_message_handler(webViewContentManager, "webview");
@@ -114,13 +113,14 @@ internal static class JSInterop
         );
     }
 
-    static nint _context;
     static nint _webView;
 
     static Dictionary<int, object> Handlers = new();
 
     static void HandleWebMessage(nint contentManager, nint jsResult, nint webView)
     {
+        Event? e = null;
+        object? handler = null;
         var jsValue = webkit_javascript_result_get_js_value(jsResult);
 
         if (jsc_value_is_string(jsValue)) 
@@ -129,35 +129,36 @@ internal static class JSInterop
             var s = Marshal.PtrToStringAuto(p);
             if (s is not null)
             {
-                var e = Event.Deserialize(s);
+                e = Event.Deserialize(s);
 
-                if (!Handlers.TryGetValue(e.DotNetMethod, out object? handler))
+                if (!Handlers.TryGetValue(e.DotNetMethod, out handler))
                 {
                     Error.WriteLine($"Handler \"{e.DotNetMethod}\" was not registered.");
-                }
-                else
-                {
-                    if (handler is Action<MouseEvent> hme && e is MouseEvent me)
-                    {
-                        hme(me);
-                    }
-                    else if (handler is Action<UIEvent> huie && e is UIEvent uie)
-                    {
-                        huie(uie);
-                    }
-                    else if (handler is Action<Event> he)
-                    {
-                        he(e);
-                    }
-                    else
-                    {
-                        Error.WriteLine("Event was not implemented");
-                    }
                 }
             }
         }
 
         webkit_javascript_result_unref(jsResult);
+
+        if (e is not null && handler is not null)
+        {
+            if (handler is Action<MouseEvent> hme && e is MouseEvent me)
+            {
+                hme(me);
+            }
+            else if (handler is Action<UIEvent> huie && e is UIEvent uie)
+            {
+                huie(uie);
+            }
+            else if (handler is Action<Event> he)
+            {
+                he(e);
+            }
+            else
+            {
+                Error.WriteLine("Event was not implemented");
+            }
+        }
     }
 
     public static T Read<T>(string js)

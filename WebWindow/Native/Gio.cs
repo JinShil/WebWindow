@@ -50,4 +50,10 @@ internal static class Gio
 
     [DllImport(FilePath)]
     public static extern void g_application_quit(nint application);
+
+    [DllImport(FilePath)]
+    public static extern uint g_timeout_add(uint interval, nint function, nint data);
+
+    [DllImport(FilePath)]
+    public static extern uint g_usleep(ulong microseconds);
 }

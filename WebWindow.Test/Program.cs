@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 using static System.Console;
 
 namespace WebWindow.Test;
@@ -12,6 +13,7 @@ static class Program
         _webWindow = new WebWindow(800, 480);
         _webWindow.Activated += Activated;
         _webWindow.Loaded += Loaded;
+        _webWindow.Closing += Closing;
 
         return _webWindow.Run();
     }
@@ -74,14 +76,6 @@ static class Program
 
             var closeButton = document.GetElementById<HTMLButtonElement>("close_button");
             closeButton.Click += CloseWindow;
-            
-            // System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            // sw.Start();
-            // for(int i = 0; i < 100000; i++)
-            // {
-            //     p1.InnerHTML = i.ToString();
-            // }
-            // p1.InnerHTML = sw.ElapsedMilliseconds.ToString();
 
             var r = document.GetElementById<HTMLDivElement>("r");
             var g = document.GetElementById<HTMLDivElement>("g");
@@ -93,11 +87,24 @@ static class Program
 
             rangeValue = document.GetElementById<HTMLSpanElement>("range_value");
             rangeValue.InnerText = range1.Value;
+
+            var update = new Action(() => {});
+            update = () =>
+            {
+                p1.InnerText = $"Run Time:  {(DateTime.Now - Process.GetCurrentProcess().StartTime)}";
+                _webWindow.InvokeAsync(update);
+            };
+            _webWindow.InvokeAsync(update);
         }
         catch(Exception ex)
         {
             Error.WriteLine(ex.Message);
         }
+    }
+
+    static void Closing(WebWindow window)
+    {
+        
     }
 
     static void CloseWindow(HTMLButtonElement el, MouseEvent e)

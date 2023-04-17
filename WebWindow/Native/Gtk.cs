@@ -75,4 +75,19 @@ internal static class Gtk
 
     [DllImport(FilePath)]
     public static extern GdkWindowState gdk_window_get_state(nint window);
+
+    [DllImport(FilePath)]
+    public static extern void gdk_threads_init();
+
+    [DllImport(FilePath)]
+    public static extern void gdk_threads_enter();
+
+    [DllImport(FilePath)]
+    public static extern void gdk_threads_leave();
+
+    [DllImport(FilePath)]
+    public static extern bool gtk_events_pending();
+
+    [DllImport(FilePath)]
+    public static extern void gtk_main_iteration();
 }

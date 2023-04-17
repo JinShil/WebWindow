@@ -118,18 +118,6 @@ internal static class WebKit
     public static extern void webkit_web_context_set_web_extensions_directory(nint context, string directory);
 
     [DllImport(FilePath)]
-    public static extern nint webkit_web_page_get_dom_document(nint web_page);
-
-    [DllImport(FilePath)]
-    public static extern nint webkit_dom_document_get_body(nint dom);
-
-    [DllImport(FilePath)]
-    public static extern void webkit_dom_html_element_set_inner_html (nint self, string contents, nint error);
-
-    [DllImport(FilePath)]
-    public static extern string webkit_dom_html_element_get_inner_html(nint self);
-
-    [DllImport(FilePath)]
     public static extern ulong webkit_web_page_get_id(nint web_page);
 
     [DllImport(FilePath)]
@@ -137,4 +125,7 @@ internal static class WebKit
 
     [DllImport(FilePath)]
     public static extern bool webkit_dom_event_target_add_event_listener(nint target, string event_name, nint handler, bool use_capture, nint user_data);
+
+    [DllImport(FilePath)]
+    public static extern void webkit_web_view_terminate_web_process(nint web_view);
 }
