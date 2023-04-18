@@ -1,4 +1,4 @@
-using WebWindow;
+using WebWindow.Dom;
 
 public class Document : Node<Document>
 {

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
+using WebWindow.Dom;
 using static System.Console;
 
 namespace WebWindow.Test;

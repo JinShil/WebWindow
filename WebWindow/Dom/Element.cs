@@ -1,4 +1,4 @@
-namespace WebWindow;
+namespace WebWindow.Dom;
 
 public abstract class Element<T> : Node<T>
     where T : Element<T>

@@ -1,4 +1,4 @@
-using WebWindow;
+namespace WebWindow.Internal;
 
 internal class Property<TValue>
 {

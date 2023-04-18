@@ -1,5 +1,4 @@
-
-namespace WebWindow;
+namespace WebWindow.Dom;
 
 public abstract class Node<T> : EventTarget<T>
     where T : Node<T>

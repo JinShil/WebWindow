@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
+using WebWindow.Dom;
 
-namespace WebWindow;
+namespace WebWindow.Internal;
 
 internal static class JSInterop
 {

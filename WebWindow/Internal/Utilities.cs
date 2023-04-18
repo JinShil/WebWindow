@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace WebWindow;
+namespace WebWindow.Internal;
 
 internal static class Utilities
 {

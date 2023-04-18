@@ -1,5 +1,4 @@
-
-namespace WebWindow;
+namespace WebWindow.Dom;
 
 public class HTMLDivElement : HTMLElement<HTMLDivElement>
 {

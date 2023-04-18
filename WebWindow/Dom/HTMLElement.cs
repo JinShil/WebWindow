@@ -1,5 +1,4 @@
-
-namespace WebWindow;
+namespace WebWindow.Dom;
 
 
 public abstract class HTMLElement<T> : Element<T>

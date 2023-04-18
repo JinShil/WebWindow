@@ -1,7 +1,6 @@
+namespace WebWindow.Dom;
 
-namespace WebWindow;
-
-static internal class IdFactory
+static file class IdFactory
 {
     static int _lastId = 0;
     public static int GetId()
