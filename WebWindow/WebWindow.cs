@@ -110,6 +110,11 @@ public class WebWindow
         webkit_web_view_load_html(_webView, html, null);
     }
 
+    public void LoadURI(string uri)
+    {
+        webkit_web_view_load_uri(_webView, uri);
+    }
+
     public int Run()
     {
         var status = g_application_run(_app, 0, nint.Zero);
