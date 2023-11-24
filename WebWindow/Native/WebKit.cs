@@ -4,7 +4,7 @@ namespace WebWindow.Native;
 
 internal static class WebKit
 {
-    public const string FilePath = "libwebkit2gtk-4.0.so.37";
+    public const string FilePath = "libwebkit2gtk-4.1.so.0";
 
     public enum WebKitUserContentInjectedFrames
     {
