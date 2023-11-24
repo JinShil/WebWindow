@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow.Native;
 
-internal static class Gtk
+internal static partial class Gtk
 {
     const string FilePath = "libgtk-3.so.0";
 
@@ -34,60 +34,61 @@ internal static class Gtk
         GDK_WINDOW_STATE_LEFT_RESIZABLE   = 1 << 16
     }
 
-    [DllImport(FilePath)]
-    public static extern void gtk_init(nint argc, nint argv);
+    [LibraryImport(FilePath)]
+    public static partial void gtk_init(nint argc, nint argv);
 
-    [DllImport(FilePath)]
-    public static extern nint gtk_application_new (string application_id, Gio.GApplicationFlags flags);
+    [LibraryImport(FilePath)]
+    public static partial nint gtk_application_new ([MarshalAs(UnmanagedType.LPUTF8Str)]string application_id, Gio.GApplicationFlags flags);
 
-    [DllImport(FilePath)]
-    public static extern nint gtk_application_window_new(nint app);
+    [LibraryImport(FilePath)]
+    public static partial nint gtk_application_window_new(nint app);
 
-    [DllImport(FilePath)]
-    public static extern nint gtk_window_new(GtkWindowType type);
+    [LibraryImport(FilePath)]
+    public static partial nint gtk_window_new(GtkWindowType type);
 
-    [DllImport(FilePath)]
-    public static extern void gtk_window_set_default_size(nint window, int width, int height);
+    [LibraryImport(FilePath)]
+    public static partial void gtk_window_set_default_size(nint window, int width, int height);
 
-    [DllImport(FilePath)]
-    public static extern void gtk_container_add(nint container, nint widget);
+    [LibraryImport(FilePath)]
+    public static partial void gtk_container_add(nint container, nint widget);
 
-    [DllImport(FilePath)]
-    public static extern void gtk_widget_show_all(nint widget);
+    [LibraryImport(FilePath)]
+    public static partial void gtk_widget_show_all(nint widget);
 
-    [DllImport(FilePath)]
-    public static extern void gtk_window_fullscreen(nint window);
+    [LibraryImport(FilePath)]
+    public static partial void gtk_window_fullscreen(nint window);
 
-    [DllImport(FilePath)]
-    public static extern void gtk_window_unfullscreen(nint window);
+    [LibraryImport(FilePath)]
+    public static partial void gtk_window_unfullscreen(nint window);
 
-    [DllImport(FilePath)]
-    public static extern void gtk_main();
+    [LibraryImport(FilePath)]
+    public static partial void gtk_main();
 
-    [DllImport(FilePath)]
-    public static extern void gtk_main_quit();
+    [LibraryImport(FilePath)]
+    public static partial void gtk_main_quit();
 
-    [DllImport(FilePath)]
-    public static extern void gtk_window_close(nint window);
+    [LibraryImport(FilePath)]
+    public static partial void gtk_window_close(nint window);
 
-    [DllImport(FilePath)]
-    public static extern nint gtk_widget_get_window(nint widget);
+    [LibraryImport(FilePath)]
+    public static partial nint gtk_widget_get_window(nint widget);
 
-    [DllImport(FilePath)]
-    public static extern GdkWindowState gdk_window_get_state(nint window);
+    [LibraryImport(FilePath)]
+    public static partial GdkWindowState gdk_window_get_state(nint window);
 
-    [DllImport(FilePath)]
-    public static extern void gdk_threads_init();
+    [LibraryImport(FilePath)]
+    public static partial void gdk_threads_init();
 
-    [DllImport(FilePath)]
-    public static extern void gdk_threads_enter();
+    [LibraryImport(FilePath)]
+    public static partial void gdk_threads_enter();
 
-    [DllImport(FilePath)]
-    public static extern void gdk_threads_leave();
+    [LibraryImport(FilePath)]
+    public static partial void gdk_threads_leave();
 
-    [DllImport(FilePath)]
-    public static extern bool gtk_events_pending();
+    [LibraryImport(FilePath)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool gtk_events_pending();
 
-    [DllImport(FilePath)]
-    public static extern void gtk_main_iteration();
+    [LibraryImport(FilePath)]
+    public static partial void gtk_main_iteration();
 }

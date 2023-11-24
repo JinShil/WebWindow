@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow.Native;
 
-internal static class GObject
+internal static partial class GObject
 {
     const string FilePath = "libgobject-2.0.so.0";
 
@@ -16,8 +16,8 @@ internal static class GObject
         public nint message = nint.Zero;
     }
 
-    [DllImport(FilePath)]
-    public static extern unsafe ulong g_error_free(GError* error);
+    [LibraryImport(FilePath)]
+    public static unsafe partial ulong g_error_free(GError* error);
 
     public enum GConnectFlags : int
     {
@@ -28,8 +28,8 @@ internal static class GObject
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void GCallback(nint instance, nint data);
 
-    [DllImport(FilePath)]
-    public static extern ulong g_signal_connect_data (nint instance, string detailed_signal, nint c_handler, nint data, nint destroy_data, GConnectFlags connect_flags);
+    [LibraryImport(FilePath)]
+    public static partial ulong g_signal_connect_data (nint instance,[MarshalAs(UnmanagedType.LPUTF8Str)] string detailed_signal, nint c_handler, nint data, nint destroy_data, GConnectFlags connect_flags);
 
     public static ulong g_signal_connect(nint instance, string detailed_signal, nint c_handler, nint data)
     {

@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow.Native;
 
-internal static class Gio
+internal static partial class Gio
 {
     const string FilePath = "libgio-2.0.so.0";
 
@@ -24,36 +24,37 @@ internal static class Gio
 
     }
 
-    [DllImport(FilePath)]
-    public static extern int g_application_run(nint application, int argc, nint argv);
+    [LibraryImport(FilePath)]
+    public static partial int g_application_run(nint application, int argc, nint argv);
 
-    [DllImport(FilePath)]
-    public static extern void g_object_unref(nint obj);
+    [LibraryImport(FilePath)]
+    public static partial void g_object_unref(nint obj);
 
-    [DllImport(FilePath)]
-    public static extern nint g_main_context_default();
+    [LibraryImport(FilePath)]
+    public static partial nint g_main_context_default();
 
-    [DllImport(FilePath)]
-    public static extern bool g_main_context_iteration(nint context, bool may_block);
+    [LibraryImport(FilePath)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool g_main_context_iteration(nint context, [MarshalAs(UnmanagedType.Bool)] bool may_block);
 
-    [DllImport(FilePath)]
-    public static extern nint g_memory_input_stream_new_from_data (byte[] data, uint len, nint destroy);
+    [LibraryImport(FilePath)]
+    public static partial nint g_memory_input_stream_new_from_data (byte[] data, uint len, nint destroy);
 
-    [DllImport(FilePath)]
-    public static extern void g_free(nint o);
+    [LibraryImport(FilePath)]
+    public static partial void g_free(nint o);
 
-    [DllImport(FilePath)]
-    public static extern uint g_idle_add_full(int priority, nint function, nint data, nint notify);
+    [LibraryImport(FilePath)]
+    public static partial uint g_idle_add_full(int priority, nint function, nint data, nint notify);
 
-    [DllImport(FilePath)]
-    public static extern uint g_idle_add(nint function, nint data);
+    [LibraryImport(FilePath)]
+    public static partial uint g_idle_add(nint function, nint data);
 
-    [DllImport(FilePath)]
-    public static extern void g_application_quit(nint application);
+    [LibraryImport(FilePath)]
+    public static partial void g_application_quit(nint application);
 
-    [DllImport(FilePath)]
-    public static extern uint g_timeout_add(uint interval, nint function, nint data);
+    [LibraryImport(FilePath)]
+    public static partial uint g_timeout_add(uint interval, nint function, nint data);
 
-    [DllImport(FilePath)]
-    public static extern uint g_usleep(ulong microseconds);
+    [LibraryImport(FilePath)]
+    public static partial uint g_usleep(ulong microseconds);
 }

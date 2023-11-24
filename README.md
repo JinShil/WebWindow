@@ -33,5 +33,5 @@ sudo apt install libstdc++-12-dev
 
 Then run the resulting executable:
 ```
-./bin/Release/net7.0/linux-x64/publish/WebWindow.Test
+./bin/Release/net8.0/linux-x64/publish/WebWindow.Test
 ```

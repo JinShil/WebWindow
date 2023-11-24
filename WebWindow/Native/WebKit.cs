@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace WebWindow.Native;
 
-internal static class WebKit
+internal static partial class WebKit
 {
     public const string FilePath = "libwebkit2gtk-4.1.so.0";
 
@@ -32,103 +32,107 @@ internal static class WebKit
      [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void GDestroyNotify(nint data);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_web_view_new();
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_web_view_new();
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_web_view_new_with_context(nint context);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_web_view_new_with_context(nint context);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_web_context_get_default();
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_web_context_get_default();
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_user_script_new(string source, WebKitUserContentInjectedFrames injected_frames,
-        WebKitUserScriptInjectionTime injection_time, string? allow_list, string? block_list);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_user_script_new([MarshalAs(UnmanagedType.LPUTF8Str)] string source, WebKitUserContentInjectedFrames injected_frames,
+        WebKitUserScriptInjectionTime injection_time, [MarshalAs(UnmanagedType.LPUTF8Str)] string? allow_list, [MarshalAs(UnmanagedType.LPUTF8Str)] string? block_list);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_web_view_get_context(nint web_view);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_web_view_get_context(nint web_view);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_user_content_manager_add_script(nint manager, nint script);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_user_content_manager_add_script(nint manager, nint script);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_user_script_unref(nint script);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_user_script_unref(nint script);
 
-    [DllImport(FilePath)]
-    public static extern bool webkit_user_content_manager_register_script_message_handler(nint manager, string name);
+    [LibraryImport(FilePath)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool webkit_user_content_manager_register_script_message_handler(nint manager, [MarshalAs(UnmanagedType.LPUTF8Str)] string name);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_web_view_run_javascript (nint web_view, string script, nint cancellable, nint callback, nint user_data);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_web_view_run_javascript (nint web_view, [MarshalAs(UnmanagedType.LPUTF8Str)] string script, nint cancellable, nint callback, nint user_data);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_javascript_result_unref(nint js_result);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_javascript_result_unref(nint js_result);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_javascript_result_get_js_value(nint js_result);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_javascript_result_get_js_value(nint js_result);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_web_view_run_javascript_finish(nint web_view, nint result, nint error);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_web_view_run_javascript_finish(nint web_view, nint result, nint error);
 
-    [DllImport(FilePath)]
-    public static extern bool jsc_value_is_string(nint value);
+    [LibraryImport(FilePath)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool jsc_value_is_string(nint value);
 
-    [DllImport(FilePath)]
-    public static extern nint jsc_value_to_string(nint value);
+    [LibraryImport(FilePath)]
+    public static partial nint jsc_value_to_string(nint value);
 
-    [DllImport(FilePath)]
-    public static extern nint jsc_value_object_get_property(nint value, string name);
+    [LibraryImport(FilePath)]
+    public static partial nint jsc_value_object_get_property(nint value, [MarshalAs(UnmanagedType.LPUTF8Str)] string name);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_web_context_register_uri_scheme(nint context, string scheme, WebKitURISchemeRequestCallback callback, nint user_data, nint user_data_destroy_func);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_web_context_register_uri_scheme(nint context, [MarshalAs(UnmanagedType.LPUTF8Str)] string scheme, WebKitURISchemeRequestCallback callback, nint user_data, nint user_data_destroy_func);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_web_view_get_user_content_manager(nint web_view);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_web_view_get_user_content_manager(nint web_view);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_web_view_load_uri(nint web_view, string uri);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_web_view_load_uri(nint web_view, [MarshalAs(UnmanagedType.LPUTF8Str)] string uri);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_uri_scheme_request_get_scheme(nint request);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_uri_scheme_request_get_scheme(nint request);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_uri_scheme_request_get_uri(nint request);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_uri_scheme_request_get_uri(nint request);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_uri_scheme_request_get_path (nint request);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_uri_scheme_request_get_path (nint request);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_uri_scheme_request_finish(nint request, nint stream, long stream_length, string mime_type);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_uri_scheme_request_finish(nint request, nint stream, long stream_length, [MarshalAs(UnmanagedType.LPUTF8Str)] string mime_type);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_web_view_get_settings(nint web_view);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_web_view_get_settings(nint web_view);
 
-    [DllImport(FilePath)]
-    public static extern bool webkit_settings_get_enable_developer_extras(nint settings);
+    [LibraryImport(FilePath)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool webkit_settings_get_enable_developer_extras(nint settings);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_settings_set_enable_developer_extras (nint settings, bool enabled);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_settings_set_enable_developer_extras (nint settings, [MarshalAs(UnmanagedType.Bool)] bool enabled);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_web_view_load_html (nint web_view, string content, string? base_uri);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_web_view_load_html (nint web_view, [MarshalAs(UnmanagedType.LPUTF8Str)] string content, [MarshalAs(UnmanagedType.LPUTF8Str)] string? base_uri);
 
-    [DllImport(FilePath)]
-    public static extern nint webkit_web_extension_get_page(nint extension, ulong pageId);
+    [LibraryImport(FilePath)]
+    public static partial nint webkit_web_extension_get_page(nint extension, ulong pageId);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_web_context_set_web_extensions_directory(nint context, string directory);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_web_context_set_web_extensions_directory(nint context, [MarshalAs(UnmanagedType.LPUTF8Str)] string directory);
 
-    [DllImport(FilePath)]
-    public static extern ulong webkit_web_page_get_id(nint web_page);
+    [LibraryImport(FilePath)]
+    public static partial ulong webkit_web_page_get_id(nint web_page);
 
-    [DllImport(FilePath)]
-    public static extern ulong webkit_web_view_get_page_id(nint web_view);
+    [LibraryImport(FilePath)]
+    public static partial ulong webkit_web_view_get_page_id(nint web_view);
 
-    [DllImport(FilePath)]
-    public static extern bool webkit_dom_event_target_add_event_listener(nint target, string event_name, nint handler, bool use_capture, nint user_data);
+    [LibraryImport(FilePath)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool webkit_dom_event_target_add_event_listener(nint target, [MarshalAs(UnmanagedType.LPUTF8Str)] string event_name, nint handler, [MarshalAs(UnmanagedType.Bool)] bool use_capture, nint user_data);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_web_view_terminate_web_process(nint web_view);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_web_view_terminate_web_process(nint web_view);
 
-    [DllImport(FilePath)]
-    public static extern void webkit_web_view_try_close (nint web_view);
+    [LibraryImport(FilePath)]
+    public static partial void webkit_web_view_try_close (nint web_view);
 }
