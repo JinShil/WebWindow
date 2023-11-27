@@ -41,7 +41,8 @@
                 "debuggerPath": "/opt/Microsoft/vsdbg/vsdbg",
             },
             "env": {
-                "DISPLAY": ":0.0"
+                "DISPLAY": ":0.0",
+                "WAYLAND_DISPLAY": "wayland-1"
             },
             "logging": {
                 "moduleLoad": false

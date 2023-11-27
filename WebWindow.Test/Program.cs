@@ -37,6 +37,9 @@ static class Program
             _webWindow.DeveloperExtrasAreEnabled = true;
             #endif
 
+            // Disable hardware acceleration for now until Raspberry Pi Bookworm and virtualbox are fixed
+            _webWindow.HardwareAccelerationIsEnabled = false;
+
             // Load the initial HTML content
             var asm = Assembly.GetExecutingAssembly();
             string resourceName = $"{asm.GetName().Name}.index.html";

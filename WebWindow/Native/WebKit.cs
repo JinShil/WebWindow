@@ -26,6 +26,13 @@ internal static partial class WebKit
         WEBKIT_LOAD_FINISHED = 3
     }
 
+    public enum WebKitHardwareAccelerationPolicy
+    {
+        WEBKIT_HARDWARE_ACCELERATION_POLICY_ON_DEMAND,
+        WEBKIT_HARDWARE_ACCELERATION_POLICY_ALWAYS,
+        WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER
+    }
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void WebKitURISchemeRequestCallback(nint instance, nint data);
 
@@ -110,6 +117,12 @@ internal static partial class WebKit
 
     [LibraryImport(FilePath)]
     public static partial void webkit_settings_set_enable_developer_extras (nint settings, [MarshalAs(UnmanagedType.Bool)] bool enabled);
+
+    [LibraryImport(FilePath)]
+    public static partial WebKitHardwareAccelerationPolicy webkit_settings_get_hardware_acceleration_policy (nint settings);
+
+    [LibraryImport(FilePath)]
+    public static partial void webkit_settings_set_hardware_acceleration_policy (nint settings, WebKitHardwareAccelerationPolicy policy);
 
     [LibraryImport(FilePath)]
     public static partial void webkit_web_view_load_html (nint web_view, [MarshalAs(UnmanagedType.LPUTF8Str)] string content, [MarshalAs(UnmanagedType.LPUTF8Str)] string? base_uri);

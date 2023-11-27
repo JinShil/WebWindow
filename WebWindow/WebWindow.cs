@@ -56,6 +56,9 @@ public class WebWindow
         g_signal_connect(_webView, "load-changed", FunctionPointer<LoadChangedHandler>(_loadChangedHandler), _webView);
         _settings = webkit_web_view_get_settings(_webView);
 
+        // Temporary fix for Raspberry Pi on Bookworm, and Virtualbox
+        // webkit_settings_set_hardware_acceleration_policy(_settings, WebKitHardwareAccelerationPolicy.WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
+
         // Show the window on the screen
         gtk_widget_show_all(_window);
 
@@ -163,6 +166,16 @@ public class WebWindow
     {
         get => webkit_settings_get_enable_developer_extras(_settings);
         set=> webkit_settings_set_enable_developer_extras(_settings, true);
+    }
+
+    public bool HardwareAccelerationIsEnabled
+    {
+        get => webkit_settings_get_hardware_acceleration_policy(_settings) == 
+            WebKitHardwareAccelerationPolicy.WEBKIT_HARDWARE_ACCELERATION_POLICY_ALWAYS;
+        set => webkit_settings_set_hardware_acceleration_policy(_settings, 
+            value 
+                ? WebKitHardwareAccelerationPolicy.WEBKIT_HARDWARE_ACCELERATION_POLICY_ALWAYS 
+                : WebKitHardwareAccelerationPolicy.WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
     }
 
     bool Timeout(nint data)
