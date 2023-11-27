@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Collections.Concurrent;
 
 namespace WebWindow;
@@ -47,13 +45,13 @@ public class WebWindow
         _window = gtk_application_window_new(app);
         gtk_window_set_default_size(_window, _defaultWidth, _defaultHeight);
         
-        g_signal_connect(_window, "delete-event", FunctionPointer<DeleteHandler>(_deleteHandler), nint.Zero);
+        g_signal_connect(_window, "delete-event", FunctionPointer(_deleteHandler), nint.Zero);
 
         // Add the WebView
         _webView = webkit_web_view_new();
         gtk_container_add(_window, _webView);
-        g_signal_connect(_webView, "context-menu", FunctionPointer<ContextMenuHandler>(_onContextMenuHandler), _webView);
-        g_signal_connect(_webView, "load-changed", FunctionPointer<LoadChangedHandler>(_loadChangedHandler), _webView);
+        g_signal_connect(_webView, "context-menu", FunctionPointer(_onContextMenuHandler), _webView);
+        g_signal_connect(_webView, "load-changed", FunctionPointer(_loadChangedHandler), _webView);
         _settings = webkit_web_view_get_settings(_webView);
 
         // Temporary fix for Raspberry Pi on Bookworm, and Virtualbox
@@ -196,6 +194,6 @@ public class WebWindow
     public void InvokeAsync(Action f)
     {
         _timeoutHandlers.Add(f);
-        g_timeout_add(0, FunctionPointer<TimeoutHandler>(_timeoutHandler), nint.Zero);
+        g_timeout_add(0, FunctionPointer(_timeoutHandler), nint.Zero);
     }
 }

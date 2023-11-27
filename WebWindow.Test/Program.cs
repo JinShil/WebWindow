@@ -73,7 +73,7 @@ static class Program
             range1.Input += OnInput;
 
             var p1 = document.GetElementById<HTMLParagraphElement>("p1");
-            p1.InnerText = $"Startup Time:  {DateTime.Now - System.Diagnostics.Process.GetCurrentProcess().StartTime}";
+            p1.InnerText = $"Startup Time:  {DateTime.Now - Process.GetCurrentProcess().StartTime}";
 
             var fsButton = document.GetElementById<HTMLButtonElement>("fs_button");
             fsButton.Click += ToggleFullscreen;
