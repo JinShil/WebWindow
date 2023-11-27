@@ -179,11 +179,14 @@ public class WebWindow
     bool Timeout(nint data)
     {
         var h = _timeoutHandlers;
-        _timeoutHandlers = new();
-
-        foreach(var a in h)
+        lock(_timeoutHandlers)
         {
-            a();
+            _timeoutHandlers = new();
+        }
+        
+        foreach(var f in h)
+        {
+            f();
         }
 
         return false;
@@ -193,7 +196,15 @@ public class WebWindow
     List<Action> _timeoutHandlers = new();
     public void InvokeAsync(Action f)
     {
-        _timeoutHandlers.Add(f);
-        g_timeout_add(0, FunctionPointer(_timeoutHandler), nint.Zero);
+        // To ensure the timeout handler doesn't get invoked between `_timeoutHandlers.Add(f)` and the call to `g_timout_add`.
+        lock(_timeoutHandlers)
+        {
+            _timeoutHandlers.Add(f);
+            var id = g_timeout_add(0, FunctionPointer(_timeoutHandler), nint.Zero);
+            if (id <= 0)
+            {
+                throw new Exception($"`{nameof(g_timeout_add)}` failed: {id}.");
+            }
+        }
     }
 }
