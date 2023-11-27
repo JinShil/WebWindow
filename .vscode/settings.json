@@ -2,5 +2,9 @@
     "projectName": "WebWindow.Test",
     "targetMachine": "192.168.0.10",
     "targetDir": "debug/",
-    "editor.fontSize": 14
+    "editor.fontSize": 14,
+    "files.exclude": {
+        "**/obj": true,
+        "**/bin": true
+    }
 }
