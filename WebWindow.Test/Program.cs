@@ -55,6 +55,8 @@ static class Program
                     _webWindow.LoadHTML(sr.ReadToEnd());
                 }
             }
+
+            // _webWindow.EnterFullscreen();
         }
         catch(Exception ex)
         {
@@ -86,15 +88,41 @@ static class Program
             var b = document.GetElementById<HTMLDivElement>("b");
             var rand = new Random();
 
-            var updateColors = () => {};
-            updateColors = () =>
+            var updater = () => {};
+            updater = () =>
             {
                 try
                 {
                     r.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
+                    _webWindow.InvokeAsync(updater);
+                }
+                catch(Exception ex)
+                {
+                    Error.WriteLine(ex.Message);
+                }
+            };
+
+            var updateg = () => {};
+            updateg = () =>
+            {
+                try
+                {
                     g.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
+                    _webWindow.InvokeAsync(updateg);
+                }
+                catch(Exception ex)
+                {
+                    Error.WriteLine(ex.Message);
+                }
+            };
+
+            var updateb = () => {};
+            updateb = () =>
+            {
+                try
+                {
                     b.Style.Background = $"rgb({(byte)rand.Next()}, {(byte)rand.Next()}, {(byte)rand.Next()})";
-                    _webWindow.InvokeAsync(updateColors);
+                    _webWindow.InvokeAsync(updateb);
                 }
                 catch(Exception ex)
                 {
@@ -109,7 +137,9 @@ static class Program
                 _webWindow.InvokeAsync(update);
             };
 
-            _webWindow.InvokeAsync(updateColors);
+            _webWindow.InvokeAsync(updater);
+            _webWindow.InvokeAsync(updateg);
+            _webWindow.InvokeAsync(updateb);
             _webWindow.InvokeAsync(update);
             
 
