@@ -10,10 +10,6 @@ public class WebWindow
     delegate bool ContextMenuHandler(nint webView, nint contextMenu, nint evt, nint hitTestResult, nint data);
     delegate bool TimeoutHandler(nint data);
 
-    // Had to do this to prevent handlers from being garbage collected before
-    // being called.
-    static ConcurrentBag<WebWindow> _windows = new();
-
     public WebWindow(int width = 1024, int height = 768)
     {
         _deleteHandler = new(Delete);
@@ -21,8 +17,6 @@ public class WebWindow
         _loadChangedHandler = new(LoadChanged);
         _onContextMenuHandler = new(OnContextMenu);
         _activateHandler = new(Activate);
-
-        _windows.Add(this);
 
         _defaultWidth = width;
         _defaultHeight = height;
@@ -53,9 +47,6 @@ public class WebWindow
         g_signal_connect(_webView, "context-menu", FunctionPointer(_onContextMenuHandler), _webView);
         g_signal_connect(_webView, "load-changed", FunctionPointer(_loadChangedHandler), _webView);
         _settings = webkit_web_view_get_settings(_webView);
-
-        // Temporary fix for Raspberry Pi on Bookworm, and Virtualbox
-        // webkit_settings_set_hardware_acceleration_policy(_settings, WebKitHardwareAccelerationPolicy.WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
 
         // Show the window on the screen
         gtk_widget_show_all(_window);
@@ -178,13 +169,7 @@ public class WebWindow
 
     bool Timeout(nint data)
     {
-        var h = _timeoutHandlers;
-        lock(_timeoutHandlers)
-        {
-            _timeoutHandlers = new();
-        }
-        
-        foreach(var f in h)
+        if (_timeoutHandlers.TryDequeue(out Action? f))
         {
             f();
         }
@@ -193,18 +178,14 @@ public class WebWindow
     }
 
     readonly TimeoutHandler _timeoutHandler;
-    List<Action> _timeoutHandlers = new();
+    readonly ConcurrentQueue<Action> _timeoutHandlers = [];
     public void InvokeAsync(Action f)
     {
-        // To ensure the timeout handler doesn't get invoked between `_timeoutHandlers.Add(f)` and the call to `g_timout_add`.
-        lock(_timeoutHandlers)
+        _timeoutHandlers.Enqueue(f);
+        var id = g_timeout_add(0, FunctionPointer(_timeoutHandler), nint.Zero);
+        if (id <= 0)
         {
-            _timeoutHandlers.Add(f);
-            var id = g_timeout_add(0, FunctionPointer(_timeoutHandler), nint.Zero);
-            if (id <= 0)
-            {
-                throw new Exception($"`{nameof(g_timeout_add)}` failed: {id}.");
-            }
+            throw new Exception($"`{nameof(g_timeout_add)}` failed: {id}.");
         }
     }
 }

@@ -110,7 +110,7 @@ static class Program
             };
 
             _webWindow.InvokeAsync(updateColors);
-            // _webWindow.InvokeAsync(update);
+            _webWindow.InvokeAsync(update);
             
 
             rangeValue = document.GetElementById<HTMLSpanElement>("range_value");
