@@ -4,7 +4,7 @@ A [WebkitGtk](https://webkitgtk.org/) Window for building [native AoT](https://l
 ## Why?
 .NET Maui is not completely multi-platform; it doesn't support Linux.  Therefore, there is no Microsoft supported way to create desktop applications in C# and .NET using web technologies.
 
-I created a [WebKit-based Blazor WebView](https://github.com/JinShil/BlazorWebView) that can be used to created [Blazor Hybrid](https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/) applications on Linux, but on low-spec ARM devices the startup time can be rather poor.  This could be fixed with native AoT, but native AoT currently generates unusable code code for anything with [Razor components](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/) (including Blazor) causing the application to either segfault or otherwise not function properly.
+I created a [WebKit-based Blazor WebView](https://github.com/JinShil/BlazorWebView) that can be used to create [Blazor Hybrid](https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/) applications on Linux, but on low-spec ARM devices the startup time can be rather poor.  This could be fixed with native AoT, but native AoT currently generates unusable code for anything with [Razor components](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/) (including Blazor) causing the application to either segfault or otherwise not function properly.
 
 This solution does not use Razor commponents.  Instead it simply exposes the WebKitGTK WebView's DOM with Javascript interop so DOM manipulation can be done in C#.  Because there are no Razor components, this solution can be compiled with native AoT for fast start times while still providing convenient DOM manipulation in C#.
 
